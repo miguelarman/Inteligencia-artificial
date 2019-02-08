@@ -1,3 +1,5 @@
+;;;;; Apartado 1
+
 ;;;;;;;;;;;;;;;;; Recursive
 (defun norma-rec (x)
 	(if(null x)
@@ -63,4 +65,10 @@
 (setf lstb '(2 3 4))
 
 (= (cosine-distance-rec lsta lstb) (cosine-distance-mapcar lsta lstb))
+
+(cosine-distance-rec '(1 2) '(1 2 3))
+(cosine-distance-rec nil '(1 2 3))
+(cosine-distance-rec '() '())
+(cosine-distance-rec '(0 0) '(0 0))
+
 	
