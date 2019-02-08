@@ -1,1 +1,1 @@
-# Interligencia-artificial
+# Inteligencia-artificial
