@@ -17,18 +17,18 @@
 
 (defun cosine-distance-rec (x y)
 	(let
-		((nx-r (norma-rec x))
-		 (ny-r (norma-rec y)))
+		((nx (norma-rec x))
+		 (ny (norma-rec y)))
 	(cond
-		((and (= nx-r 0)
-			  (= ny-r 0))
+		((and (= nx 0)
+			  (= ny 0))
 				0)
-		((= nx-r 0) 1)
-		((= ny-r 0) 1)
+		((= nx 0) 1)
+		((= ny 0) 1)
 		(T (- 1
 				(/  (producto-escalar-rec x y)
-					(*  (sqrt nx-r)
-		 			 	(sqrt ny-r))))))))
+					(*  (sqrt nx)
+		 			 	(sqrt ny))))))))
 
 ;;;;;;;;;; Mapcar
 
@@ -46,18 +46,18 @@
 
 (defun cosine-distance-mapcar (x y)
 	(let
-		((nx-m (norma-mapcar x))
-		 (ny-m (norma-mapcar y)))
+		((nx (norma-mapcar x))
+		 (ny (norma-mapcar y)))
 	(cond
-		((and (= nx-m 0)
-			  (= ny-m 0))
+		((and (= nx 0)
+			  (= ny 0))
 				0)
-		((= nx-m 0) 1)
-		((= ny-m 0) 1)
+		((= nx 0) 1)
+		((= ny 0) 1)
 		(T (- 1
 				(/  (producto-escalar-mapcar x y)
-					(*  (sqrt nx-m)
-		 			 	(sqrt ny-m))))))))
+					(*  (sqrt nx)
+		 			 	(sqrt ny))))))))
 
 (setf lsta '(1 2 3))
 (setf lstb '(2 3 4))
