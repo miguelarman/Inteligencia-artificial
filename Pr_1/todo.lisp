@@ -70,32 +70,37 @@
 ;;;;;;;;;; Apartado 2
 
 (defun calcular-confianza (x y)
-	(- 1 (cosine-distance-rec x y)))
+  (- 1 (cosine-distance-rec x y)))
 
 (defun insertar-ordenado (elemento lista vector)
-	(if (null lista)
-		(cons elemento nil)
-		(if (> (calcular-confianza elemento vector) (calcular-confianza (first lista) vector))
-			(cons elemento lista)
-			(cons (first lista) (insertar-ordenado elemento (rest lista) vector)))))
+  (if (null lista)
+      (cons elemento nil)
+    (if (> (calcular-confianza elemento vector) (calcular-confianza (first lista) vector))
+        (cons elemento lista)
+      (cons
+       (first lista)
+       (insertar-ordenado elemento (rest lista) vector)))))
 
 (defun insertar-ordenados (origen destino vector)
-	(if (null origen)
-		destino
-		(insertar-ordenados (rest origen) (insertar-ordenado (first origen) destino vector) vector)))
+  (if (null origen)
+      destino
+    (insertar-ordenados
+     (rest origen)
+     (insertar-ordenado (first origen) destino vector)
+     vector)))
 
 (defun ordenar-lista (lista vector)
-	(insertar-ordenados lista '() vector))
+  (insertar-ordenados lista '() vector))
 
 (defun filtrar (lista vector minima-confianza)
-	(if (null lista)
-		nil
-		(if (>= (calcular-confianza (first lista) vector) minima-confianza)
-			(cons (first lista) (filtrar (rest lista) vector minima-confianza))
-			(filtrar (rest lista) vector minima-confianza))))
+  (if (null lista)
+      nil
+    (if (>= (calcular-confianza (first lista) vector) minima-confianza)
+        (cons (first lista) (filtrar (rest lista) vector minima-confianza))
+      (filtrar (rest lista) vector minima-confianza))))
 
 (defun order-vectors-cosine-distance (vector lst-of-vectors &optional (confidence-level 0))
-	(ordenar-lista (filtrar lst-of-vectors vector confidence-level) vector))
+  (ordenar-lista (filtrar lst-of-vectors vector confidence-level) vector))
 
 (order-vectors-cosine-distance '(1 2 3) '((32 454  123) (133 12 1) (4 2 2)) 0.5)
 (order-vectors-cosine-distance '(1 2 3) '((32 454  123) (133 12 1) (4 2 2)) 0.3)
@@ -120,14 +125,12 @@
 ;;; de menor distancia , junto con el valor de dicha distancia
 ;;;
 (defun get-vectors-category (categories texts distance-measure)
-	nil)
+  nil) ;;;;;;;;; FALTA ESTO
 
 (setf categories '((1 43 23 12) (2 33 54 24)))
 (setf texts '((1 3 22 134) (2 43 26 58)))
-(get-vectors-category categories texts #'cosine-distance-rec)
-;; ---> ((2 0.510181) (1 0.184449))
-(get-vectors-category categories texts #'cosine-distance-mapcar)
-;; ---> ((2 0.510181) (1 0.184449))
+(get-vectors-category categories texts #'cosine-distance-rec) ;; ---> ((2 0.510181) (1 0.184449))
+(get-vectors-category categories texts #'cosine-distance-mapcar) ;; ---> ((2 0.510181) (1 0.184449))
 
 
 
