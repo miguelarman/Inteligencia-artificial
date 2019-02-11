@@ -8,64 +8,54 @@
 
 ;;;;;;;;;;;;;;;;; Recursive
 (defun norma-rec (x)
-	(if (null x)
-		0
-		(+
-			(* (first x) (first x))
-			(norma-rec (rest x)))))
+  (if (null x)
+      0
+    (+
+     (* (first x) (first x))
+     (norma-rec (rest x)))))
 
 (defun producto-escalar-rec (x y)
-	(cond
-		((null x) 0)
-		((null y) 0)
-		(T
-			(+ 
-				(* (first x) (first y))
-				(producto-escalar-rec (rest x) (rest y))))))
+  (cond
+   ((null x) 0)
+   ((null y) 0)
+   (T (+ (* (first x) (first y))
+         (producto-escalar-rec (rest x) (rest y))))))
 
 (defun cosine-distance-rec (x y)
-	(let
-		((nx (norma-rec x))
-		 (ny (norma-rec y)))
-	(cond
-		((and (= nx 0)
-			  (= ny 0))
-				0)
-		((= nx 0) 1)
-		((= ny 0) 1)
-		(T (- 1
-				(/  (producto-escalar-rec x y)
-					(*  (sqrt nx)
-		 			 	(sqrt ny))))))))
+  (let
+      ((nx (norma-rec x))
+       (ny (norma-rec y)))
+    (cond
+     ((and (= nx 0) (= ny 0)) 0)
+     ((= nx 0) 1)
+     ((= ny 0) 1)
+     (T (- 1
+           (/ (producto-escalar-rec x y)
+              (* (sqrt nx)
+                 (sqrt ny))))))))
 
 ;;;;;;;;;; Mapcar
 
 (defun norma-mapcar (x)
-	(apply #'+
-		(mapcar #'* x x)))
+  (apply #'+ (mapcar #'* x x)))
 
 (defun producto-escalar-mapcar (x y)
-	(cond
-		((null x) 0)
-		((null y) 0)
-		(T
-			(apply #'+
-				(mapcar #'* x y)))))
+  (cond
+   ((null x) 0)
+   ((null y) 0)
+   (T (apply #'+ (mapcar #'* x y)))))
 
 (defun cosine-distance-mapcar (x y)
-	(let
-		((nx (norma-mapcar x))
-		 (ny (norma-mapcar y)))
-	(cond
-		((and (= nx 0)
-			  (= ny 0))
-				0)
-		((= nx 0) 1)
-		((= ny 0) 1)
-		(T (- 1
-				(/  (producto-escalar-mapcar x y)
-					(*  (sqrt nx)
-		 			 	(sqrt ny))))))))
+  (let
+      ((nx (norma-mapcar x))
+       (ny (norma-mapcar y)))
+    (cond
+     ((and (= nx 0) (= ny 0)) 0)
+     ((= nx 0) 1)
+     ((= ny 0) 1)
+     (T (- 1
+           (/ (producto-escalar-mapcar x y)
+              (* (sqrt nx) (sqrt ny))))))))
 
 (setf lsta '(1 2 3))
 (setf lstb '(2 3 4))
@@ -155,20 +145,33 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;; Apartado 1
-(defun combine-elt-lst (elt lst) ;;; Comprobar si elt es nil?
-	(if (null lst)
-		nil
-		(cons
-			(cons elt (cons (first lst) nil))
-			(combine-elt-lst elt (rest lst)))))
+(defun combine-elt-lst (elt lst)
+  (cond
+   ((and (null elt) (null lst)) nil)
+   ;((null lst) (cons elt nil))
+   ((null lst) nil)
+   ((null elt) (cons
+                (cons (first lst) nil)
+                (combine-elt-lst elt (rest lst))))
+   (T (cons
+       (cons elt (cons (first lst) nil))
+       (combine-elt-lst elt (rest lst))))))
 
-(combine-elt-lst 'a '(1 2 3))
-;; --> ((A 1) (A 2) (A 3))
+(combine-elt-lst 'a '(1 2 3)) ;; --> ((A 1) (A 2) (A 3))
 
 (combine-elt-lst 'a nil)
 (combine-elt-lst nil nil)
 (combine-elt-lst nil '(a b))
 
 ;;;;;;; Apartado 2
-(defun combine-lst-lst (lst1 lst2)
-	
+(defun combine-lst-lst (lst1 lst2) ;;;;;;;; NO FUNCIONA
+  (cond 
+   ((and (null lst1) (null lst2)) nil)
+   ((null lst1) nil)
+   (T (append (combine-elt-lst (first lst1) lst2)
+              (combine-lst-lst (rest lst1) lst2)))))
+
+(combine-lst-lst '(a b c) '(1 2)) ;; --> ((A 1) (A 2) (B 1) (B 2) (C 1) (C 2))
+(combine-lst-lst nil nil)
+(combine-lst-lst '(a b c) nil)
+(combine-lst-lst nil '(a b c))
