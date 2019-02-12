@@ -292,37 +292,11 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;Apartado 1
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; iteracion
-;;; Calcula el siguiente punto iterando el punto anterior
-;;; segun el metodo de Newton
-;;;
-;;; INPUT : f: funcion cuyo cero se desea encontrar
-;;; df: derivada de f
-;;; x0: estimacion del cero
-;;; OUTPUT : siguiente paso de la iteracion, NIL si
-;;;          el punto es suficientemente grande como
-;;;          para concluir que no converge
-;;;
 (defun iteracion (f df x0)
   (if (> x0 100000)
       NIL
     (- x0 (/ (funcall f x0) (funcall df x0)))))
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; ultima-iteracion
-;;; Realiza la ultima iteracion por Newton, esta vez
-;;; teniendo en cuenta si el punto cumple la condicion de
-;;; tolerancia
-;;;
-;;; INPUT : f: funcion cuyo cero se desea encontrar
-;;; df: derivada de f
-;;; penult: ultima estimacion antes de la estimacion final
-;;; tol: tolerancia para convergencia ( parametro opcional )
-;;; OUTPUT : estimacion del cero de f, o NIL si no converge
-;;;
 (defun ultima-iteracion (f df penult tol)
   (let ((ultimo (iteracion f df penult)))
     (cond
@@ -330,36 +304,10 @@
      ((< (abs (- penult ultimo)) tol) ultimo)
      (T NIL))))
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; newton-rec
-;;; Funcion recursiva utilizada para hacer la funcion newton,
-;;; donde calculamos el punto sin tener en cuenta la tolerancia
-;;;
-;;; INPUT : f: funcion cuyo cero se desea encontrar
-;;; df: derivada de f
-;;; max-iter : iteraciones restantes hasta el caso base
-;;; x0: estimacion del cero
-;;; OUTPUT : estimacion del cero de f, o NIL si no converge
-;;;
-
 (defun newton-rec (f df max-iter x0)
   (if (> max-iter 0)
       (iteracion f df (newton-rec f df (- max-iter 1) x0))
     (iteracion f df x0)))
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; newton
-;;; Estima el cero de una funcion mediante Newton-Raphson
-;;;
-;;; INPUT : f: funcion cuyo cero se desea encontrar
-;;; df: derivada de f
-;;; max-iter : maximo numero de iteraciones
-;;; x0: estimacion inicial del cero ( semilla )
-;;; tol: tolerancia para convergencia ( parametro opcional )
-;;; OUTPUT : estimacion del cero de f, o NIL si no converge
-;;;
 
 (defun newton (f df max-iter x0 &optional (tol 0.001)) 
   (cond ((<= tol 0) NIL)
@@ -372,21 +320,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;Apartado 2
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; one-root-newton
-;;; Prueba con distintas semillas iniciales hasta que Newton
-;;; converge
-;;;
-;;; INPUT : f: funcion de la que se desea encontrar un cero
-;;; df: derivada de f
-;;; max-iter : maximo numero de iteraciones
-;;; semillas : semillas con las que invocar a Newton
-;;; tol: tolerancia para convergencia ( parametro opcional )
-;;;
-;;; OUTPUT : el primer cero de f que se encuentre , o NIL si se diverge
-;;; para todas las semillas
-;;;
-
 (defun one-root-newton (f df max-iter semillas &optional (tol 0.001))
   (if (null semillas)
       NIL
@@ -397,21 +330,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;Apartado 3
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; all-roots-newton
-;;; Prueba con distintas semillas iniciales y devuelve las raices
-;;; encontradas por Newton para dichas semillas
-;;;
-;;; INPUT : f: funcion de la que se desea encontrar un cero
-;;; df: derivada de f
-;;; max-iter : maximo numero de iteraciones
-;;; semillas : semillas con las que invocar a Newton
-;;; tol: tolerancia para convergencia ( parametro opcional )
-;;;
-;;; OUTPUT : las raices que se encuentren para cada semilla o nil
-;;; si para esa semilla el metodo no converge
-;;;
-
 (defun all-roots-newton (f df max-iter semillas &optional (tol 0.001))
   (if (null semillas)
       NIL
@@ -419,20 +337,6 @@
           (all-roots-newton f df max-iter (rest semillas) tol))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;Apartado 3.1
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; list-not-nil-roots-newton
-;;; Prueba con distintas semillas iniciales y devuelve solo las
-;;; raices que converjan (no devuelve ningun NIL)
-;;;
-;;; INPUT : f: funcion de la que se desea encontrar un cero
-;;; df: derivada de f
-;;; max-iter : maximo numero de iteraciones
-;;; semillas : semillas con las que invocar a Newton
-;;; tol: tolerancia para convergencia ( parametro opcional )
-;;;
-;;; OUTPUT : las raices que se encuentren para cada semilla (si existe)
-;;;
 
 (defun list-not-nil-roots-newton (f df max-iter semillas &optional (tol 0.001))
   (mapcan (lambda (x) (if (null x) NIL (list x))) 
