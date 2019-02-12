@@ -7,12 +7,33 @@
 ;;;;; Apartado 1
 
 ;;;;;;;;;;;;;;;;; Recursive
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; norma-rec
+;;; 
+;;; Calcula la norma de un vector de forma recursiva
+;;;
+;;; INPUT:  x: vector, representado como una lista
+;;; OUTPUT: norma de x
+;;;
+
 (defun norma-rec (x)
   (if (null x)
       0
     (+
      (* (first x) (first x))
      (norma-rec (rest x)))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; producto-escalar-rec
+;;; 
+;;; Calcula el producto escalar de dos vectores de forma recursiva
+;;; Se asume que los dos vectores de entrada tienen la misma longitud.
+;;;
+;;; INPUT:  x: vector, representado como una lista
+;;;         y: vector, representado como una lista
+;;; OUTPUT: producto escalar de x e y
+;;;
 
 (defun producto-escalar-rec (x y)
   (cond
@@ -30,6 +51,7 @@
 ;;;         y: vector, representado como una lista
 ;;; OUTPUT: distancia coseno entre x e y
 ;;;
+
 (defun cosine-distance-rec (x y)
   (let
       ((nx (norma-rec x))
@@ -45,8 +67,28 @@
 
 ;;;;;;;;;; Mapcar
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; norma-mapcar
+;;; 
+;;; Calcula la norma de un vector usando mapcar
+;;;
+;;; INPUT:  x: vector, representado como una lista
+;;; OUTPUT: norma de x
+;;;
+
 (defun norma-mapcar (x)
   (apply #'+ (mapcar #'* x x)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; producto-escalar-mapcar
+;;; 
+;;; Calcula el producto escalar de dos vectores usando mapcar
+;;; Se asume que los dos vectores de entrada tienen la misma longitud.
+;;;
+;;; INPUT:  x: vector, representado como una lista
+;;;         y: vector, representado como una lista
+;;; OUTPUT: producto escalar de x e y
+;;;
 
 (defun producto-escalar-mapcar (x y)
   (cond
@@ -63,6 +105,7 @@
 ;;;         y: vector, representado como una lista
 ;;; OUTPUT: distancia coseno entre x e y
 ;;;
+
 (defun cosine-distance-mapcar (x y)
   (let
       ((nx (norma-mapcar x))
@@ -75,20 +118,34 @@
            (/ (producto-escalar-mapcar x y)
               (* (sqrt nx) (sqrt ny))))))))
 
-(setf lsta '(1 2 3))
-(setf lstb '(2 3 4))
-
-(= (cosine-distance-rec lsta lstb) (cosine-distance-mapcar lsta lstb))
-
-(cosine-distance-rec '(1 2) '(1 2 3))
-(cosine-distance-rec nil '(1 2 3))
-(cosine-distance-rec '() '())
-(cosine-distance-rec '(0 0) '(0 0))
 
 ;;;;;;;;;; Apartado 2
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; calcular-confianza
+;;;
+;;; Calcula la confianza de dos vectores
+;;;
+;;; INPUT:  x: primer vector
+;;;         y: segundo vector
+;;; OUTPUT: Valor de la confianza entre ambos vectores
+;;;
+
 (defun calcular-confianza (x y)
   (- 1 (cosine-distance-rec x y)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; insertar-ordenado
+;;;
+;;; Funcion recursiva que inserta un elemento en una lista, ordenado
+;;; por su confianza con un vector
+;;;
+;;; INPUT:  elemento: elemento a insertar
+;;;         lista: lista donde se quiere insertar el elemento
+;;;         vector: vector con el que se comparan
+;;; OUTPUT: Lista con el elemento extra ordenados con respecto a
+;;; su semejanza a una categoria
+;;;
 
 (defun insertar-ordenado (elemento lista vector)
   (if (null lista)
@@ -99,6 +156,19 @@
        (first lista)
        (insertar-ordenado elemento (rest lista) vector)))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; insertar-ordenados
+;;;
+;;; Inserta los elementos de una lista en otra, ordenados
+;;; por su confianza con un vector
+;;;
+;;; INPUT:  origen: lista de origen
+;;;         destino: lista de destino
+;;;         vector: vector con el que se comparan
+;;; OUTPUT: Vectores ordenados por su semejanza con respecto a
+;;; una categoria
+;;;
+
 (defun insertar-ordenados (origen destino vector)
   (if (null origen)
       destino
@@ -107,8 +177,34 @@
      (insertar-ordenado (first origen) destino vector)
      vector)))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; ordenar-lista
+;;;
+;;; Ordena una lista respecto a la confianza de cada elemento con respecto
+;;; a un vector
+;;;
+;;; INPUT:  lista: vector de vectores
+;;;         vector: vector con el que se compara cada elemento
+;;; OUTPUT: Vectores ordenados por su semejanza con respecto a
+;;; una categoria
+;;;
+
 (defun ordenar-lista (lista vector)
   (insertar-ordenados lista '() vector))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; filtrar
+;;;
+;;; Filtra de una lista aquellos elementos que tengan una confianza
+;;; respecto a un vector menor a un límite inferior
+;;;
+;;; INPUT:  vector: vector que representa a una categoria,
+;;;                 representado como una lista
+;;;         lista: vector de vectores
+;;;         confidence-level: Nivel de confianza minimo
+;;; OUTPUT: Vectores cuya semejanza con respecto a la
+;;;         categoria es superior al nivel de confianza ,
+;;;
 
 (defun filtrar (lista vector minima-confianza)
   (if (null lista)
@@ -119,7 +215,9 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; order-vectors-cosine-distance
+;;;
 ;;; Devuelve aquellos vectores similares a una categoria
+;;;
 ;;; INPUT:  vector: vector que representa a una categoria,
 ;;;                 representado como una lista
 ;;;         lst-of-vectors vector de vectores
@@ -128,16 +226,29 @@
 ;;;         categoria es superior al nivel de confianza ,
 ;;;         ordenados
 ;;;
+
 (defun order-vectors-cosine-distance (vector lst-of-vectors &optional (confidence-level 0))
   (ordenar-lista (filtrar lst-of-vectors vector confidence-level) vector))
 
-(order-vectors-cosine-distance '(1 2 3) '((32 454  123) (133 12 1) (4 2 2)) 0.5)
-(order-vectors-cosine-distance '(1 2 3) '((32 454  123) (133 12 1) (4 2 2)) 0.3)
-(order-vectors-cosine-distance '(1 2 3) '((32 454  123) (133 12 1) (4 2 2)) 0.99)
 
 
 	
 ;;;;;;;;;; Apartado 3
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; best-category
+;;; 
+;;; Funcion recursiva que para una lista de categorias y un texto
+;;; devuelve un par formado por el identificador de la categoria
+;;; con menor distancia y la respectiva distancia
+;;;
+;;; INPUT : categories: vector de vectores, representado como
+;;;                     una lista de listas
+;;;         text:       vectores, que representa un texto
+;;;         distance-measure: funcion de distancia
+;;; OUTPUT: Par formado por el vector que identifica la categoria
+;;;         de menor distancia, junto con el valor de dicha distancia
+;;;
 
 (defun best-category (categories text distance-measure)
   (if (null categories)
@@ -165,25 +276,20 @@
 ;;; OUTPUT: Pares formados por el vector que identifica la categoria
 ;;;         de menor distancia , junto con el valor de dicha distancia
 ;;;
+
 (defun get-vectors-category (categories texts distance-measure) ;;;;;;;;; FALTA ESTO
   (if (null texts)
       nil
     (cons
      (best-category categories (first texts) distance-measure)
      (get-vectors-category categories (rest texts) distance-measure))))
-           
-(setf categories '((1 43 23 12) (2 33 54 24)))
-(setf texts '((1 3 22 134) (2 43 26 58)))
-(get-vectors-category categories texts #'cosine-distance-rec) ;; ---> ((2 0.510181) (1 0.184449))
-(get-vectors-category categories texts #'cosine-distance-mapcar) ;; ---> ((2 0.510181) (1 0.184449))
-
-
-
+     
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; EJERCICIO 2 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;;;;;;;;;;;;;;;;;;;;;;;Apartado 1
 
 (defun iteracion (f df x0)
@@ -254,6 +360,7 @@
 ;;;
 ;;; OUTPUT: lista con las combinacion del elemento con cada uno de los
 ;;;         de la lista
+
 (defun combine-elt-lst (elt lst)
   (cond
    ((and (null elt) (null lst)) nil)
@@ -266,11 +373,7 @@
        (cons elt (cons (first lst) nil))
        (combine-elt-lst elt (rest lst))))))
 
-(combine-elt-lst 'a '(1 2 3)) ;; --> ((A 1) (A 2) (A 3))
 
-(combine-elt-lst 'a nil)
-(combine-elt-lst nil nil)
-(combine-elt-lst nil '(a b))
 
 ;;;;;;; Apartado 2
 
@@ -282,6 +385,7 @@
 ;;;        lst2: segunda lista
 ;;;
 ;;; OUTPUT: producto cartesiano de las dos listas
+
 (defun combine-lst-lst (lst1 lst2)
   (cond
    ((and (null lst1) (null lst2)) nil)
@@ -289,12 +393,19 @@
    (T (append (combine-elt-lst (first lst1) lst2)
               (combine-lst-lst (rest lst1) lst2)))))
 
-(combine-lst-lst '(a b c) '(1 2)) ;; --> ((A 1) (A 2) (B 1) (B 2) (C 1) (C 2))
-(combine-lst-lst nil nil)
-(combine-lst-lst '(a b c) nil)
-(combine-lst-lst nil '(a b c))
+
 
 ;;;;;;;;;; Apartado 3
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; combine-elt-cons
+;;; Funcion recursiva que junta un elemento
+;;; con otra lista formada por cons
+;;;
+;;; INPUT: elt: elemento a juntar
+;;;        list-of-cons: lista de cons
+;;;
+;;; OUTPUT: lista con todas las posibles combinaciones de elementos
 
 (defun combine-elt-cons (elt list-of-cons)
   (if (null list-of-cons)
@@ -303,12 +414,21 @@
      (cons elt (first list-of-cons))
      (combine-elt-cons elt (rest list-of-cons)))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; combine-lst-with-list-of-cons
+;;; Funcion recursiva que junta un lista de atomos
+;;; con otra lista formada por cons
+;;;
+;;; INPUT: lst: lista de atomos
+;;;        list-of-cons: lista de cons
+;;;
+;;; OUTPUT: lista con todas las posibles combinaciones de elementos
+
 (defun combine-lst-with-list-of-cons (list list-of-cons)
   (cond
    ((null list) nil)
-   ((null (first list-of-cons))
-    (cons (cons (first list) nil)
-          (combine-lst-with-list-of-cons (rest list) list-of-cons)))
+   ((null (first list-of-cons)) (cons (cons (first list) nil)
+                                      (combine-lst-with-list-of-cons (rest list) list-of-cons)))
    (T (append
        (combine-elt-cons (first list) list-of-cons)
        (combine-lst-with-list-of-cons (rest list) list-of-cons)))))
@@ -324,21 +444,13 @@
 ;;; INPUT: lstolsts: lista de listas
 ;;;
 ;;; OUTPUT: lista con todas las posibles combinaciones de elementos
+
 (defun combine-list-of-lsts (lstoflsts)
-  (if (null (first lstoflsts))
-      '(nil)
-    (combine-lst-with-list-of-cons (first lstoflsts) (combine-list-of-lsts (rest lstoflsts)))))
+  (cond
+   ((null lstoflsts) nil)
+   ((null (first lstoflsts)) '(nil))
+   (T (combine-lst-with-list-of-cons (first lstoflsts) (combine-list-of-lsts (rest lstoflsts))))))
 
 
-(combine-list-of-lsts '((a b c) (+ -) (1 2 3 4)))
-;; ((A + 1) (A + 2) (A + 3) (A + 4) (A - 1) (A - 2) (A - 3) (A - 4)
-;;  (B + 1) (B + 2) (B + 3) (B + 4) (B - 1) (B - 2) (B - 3) (B - 4)
-;;  (C + 1) (C + 2) (C + 3) (C + 4) (C - 1) (C - 2) (C - 3) (C - 4))
 
-(combine-list-of-lsts ’(() (+ -) (1 2 3 4)))
-(combine-list-of-lsts ’((a b c) () (1 2 3 4)))
-(combine-list-of-lsts ’((a b c) (1 2 3 4) ()))
-(combine-list-of-lsts ’((1 2 3 4)))
-(combine-list-of-lsts ’(nil))
-(combine-list-of-lsts nil)
 
