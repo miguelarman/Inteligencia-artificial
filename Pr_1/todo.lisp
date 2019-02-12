@@ -167,8 +167,8 @@
 (combine-elt-lst nil '(a b))
 
 ;;;;;;; Apartado 2
-(defun combine-lst-lst (lst1 lst2) ;;;;;;;; NO FUNCIONA
-  (cond 
+(defun combine-lst-lst (lst1 lst2)
+  (cond
    ((and (null lst1) (null lst2)) nil)
    ((null lst1) nil)
    (T (append (combine-elt-lst (first lst1) lst2)
@@ -178,3 +178,23 @@
 (combine-lst-lst nil nil)
 (combine-lst-lst '(a b c) nil)
 (combine-lst-lst nil '(a b c))
+
+;;;;;;;;;; Apartado 3
+(defun combine-list-of-lsts (lstolsts) ;;;;;;;;;; FALTA
+  (if (null lstoflsts)
+      nil
+    nil))
+
+
+(combine-list-of-lsts '((a b c) (+ -) (1 2 3 4)))
+;; ((A + 1) (A + 2) (A + 3) (A + 4) (A - 1) (A - 2) (A - 3) (A - 4)
+;;  (B + 1) (B + 2) (B + 3) (B + 4) (B - 1) (B - 2) (B - 3) (B - 4)
+;;  (C + 1) (C + 2) (C + 3) (C + 4) (C - 1) (C - 2) (C - 3) (C - 4))
+
+(combine-list-of-lsts ’(() (+ -) (1 2 3 4)))
+(combine-list-of-lsts ’((a b c) () (1 2 3 4)))
+(combine-list-of-lsts ’((a b c) (1 2 3 4) ()))
+(combine-list-of-lsts ’((1 2 3 4)))
+(combine-list-of-lsts ’(nil))
+(combine-list-of-lsts nil)
+
