@@ -200,21 +200,28 @@
 ;;;;;;;;;; Apartado 3
 
 (defun combine-elt-cons (elt list-of-cons)
-  (cons elt list-of-cons))
-
-(defun combine-lst-with-list-of-cons (list list-of-cons)
-  (if (null list)
+  (if (null list-of-cons)
       nil
     (cons
-     (combine-elt-cons (first list) list-of-cons)
-     (combine-lst-with-list-of-cons (rest list) list-of-cons))))
+     (cons elt (first list-of-cons))
+     (combine-elt-cons elt (rest list-of-cons)))))
+
+(defun combine-lst-with-list-of-cons (list list-of-cons)
+  (cond
+   ((null list) nil)
+   ((null (first list-of-cons))
+    (cons (cons (first list) nil)
+          (combine-lst-with-list-of-cons (rest list) list-of-cons)))
+   (T (append
+       (combine-elt-cons (first list) list-of-cons)
+       (combine-lst-with-list-of-cons (rest list) list-of-cons)))))
 
 
 
 (defun combine-list-of-lsts (lstoflsts)
-  (if (null lstoflsts)
+  (if (null (first lstoflsts))
       '(nil)
-    (combine-lst-with-list-of-cons (first lstoflsts) (combine-list-of-lists (rest lstoslsts)))))
+    (combine-lst-with-list-of-cons (first lstoflsts) (combine-list-of-lsts (rest lstoflsts)))))
 
 
 (combine-list-of-lsts '((a b c) (+ -) (1 2 3 4)))
