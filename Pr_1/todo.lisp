@@ -110,6 +110,21 @@
 	
 ;;;;;;;;;; Apartado 3
 
+(defun best-category (categories text distance-measure)
+  (if (null categories)
+      nil
+    (let
+        (min-parcial (best-category (rest categories) text distance-measure))
+      (if (null min-parcial) ;; Es el último categoria
+          (cons (first (first categories))
+                (cons (funcall distance-measure (first categories) text) nil))
+        (if (< (funcall distance-measure (first categories) text) (first (rest min-parcial)))
+            (cons (first (first categories))
+                  (cons (funcall distance-measure (first categories) text)))
+          (min-parcial))))))
+    
+  
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; get-vectors-category ( categories vectors distance-measure )
 ;;; Clasifica a los textos en categorias .
@@ -124,9 +139,13 @@
 ;;; OUTPUT : Pares formados por el vector que identifica la categoria
 ;;; de menor distancia , junto con el valor de dicha distancia
 ;;;
-(defun get-vectors-category (categories texts distance-measure)
-  nil) ;;;;;;;;; FALTA ESTO
-
+(defun get-vectors-category (categories texts distance-measure) ;;;;;;;;; FALTA ESTO
+  (if (null texts)
+      nil
+    (cons
+     (best-category categories (first texts) distance-measure)
+     (get-vectors-category categories (rest texts) distance-measure))))
+           
 (setf categories '((1 43 23 12) (2 33 54 24)))
 (setf texts '((1 3 22 134) (2 43 26 58)))
 (get-vectors-category categories texts #'cosine-distance-rec) ;; ---> ((2 0.510181) (1 0.184449))
