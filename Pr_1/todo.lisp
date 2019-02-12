@@ -114,14 +114,13 @@
   (if (null categories)
       nil
     (let
-        (min-parcial (best-category (rest categories) text distance-measure))
-      (if (null min-parcial) ;; Es el último categoria
-          (cons (first (first categories))
-                (cons (funcall distance-measure (first categories) text) nil))
-        (if (< (funcall distance-measure (first categories) text) (first (rest min-parcial)))
-            (cons (first (first categories))
-                  (cons (funcall distance-measure (first categories) text)))
-          (min-parcial))))))
+        ((min-parcial (best-category (rest categories) text distance-measure))
+         (nuevo-min (cons (first (first categories))
+                          (cons (funcall distance-measure (rest (first categories)) (rest text)) nil))))
+      (cond
+       ((null min-parcial) nuevo-min)
+       ((< (first (rest nuevo-min))) (first (rest min-parcial)) nuevo-min)
+       (T (min-parcial))))))
     
   
 
