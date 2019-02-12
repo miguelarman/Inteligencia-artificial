@@ -21,6 +21,15 @@
    (T (+ (* (first x) (first y))
          (producto-escalar-rec (rest x) (rest y))))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; cosine-distance-rec (x y)
+;;; Calcula la distancia coseno de un vector de forma recursiva
+;;; Se asume que los dos vectores de entrada tienen la misma longitud.
+;;;
+;;; INPUT: x: vector, representado como una lista
+;;;         y: vector, representado como una lista
+;;; OUTPUT: distancia coseno entre x e y
+;;;
 (defun cosine-distance-rec (x y)
   (let
       ((nx (norma-rec x))
@@ -45,6 +54,15 @@
    ((null y) 0)
    (T (apply #'+ (mapcar #'* x y)))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; cosine-distance-mapcar
+;;; Calcula la distancia coseno de un vector usando mapcar
+;;; Se asume que los dos vectores de entrada tienen la misma longitud.
+;;;
+;;; INPUT:  x: vector, representado como una lista
+;;;         y: vector, representado como una lista
+;;; OUTPUT: distancia coseno entre x e y
+;;;
 (defun cosine-distance-mapcar (x y)
   (let
       ((nx (norma-mapcar x))
@@ -99,6 +117,17 @@
         (cons (first lista) (filtrar (rest lista) vector minima-confianza))
       (filtrar (rest lista) vector minima-confianza))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; order-vectors-cosine-distance
+;;; Devuelve aquellos vectores similares a una categoria
+;;; INPUT:  vector: vector que representa a una categoria,
+;;;                 representado como una lista
+;;;         lst-of-vectors vector de vectores
+;;;         confidence-level: Nivel de confianza (parametro opcional)
+;;; OUTPUT: Vectores cuya semejanza con respecto a la
+;;;         categoria es superior al nivel de confianza ,
+;;;         ordenados
+;;;
 (defun order-vectors-cosine-distance (vector lst-of-vectors &optional (confidence-level 0))
   (ordenar-lista (filtrar lst-of-vectors vector confidence-level) vector))
 
@@ -124,19 +153,17 @@
     
   
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; get-vectors-category ( categories vectors distance-measure )
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; get-vectors-category (categories vectors distance-measure)
 ;;; Clasifica a los textos en categorias .
 ;;;
-;;; INPUT : categories : vector de vectores , representado como
-;;; una lista de listas . Cada uno de ellos
-;;; caracteriza una categoria
-;;; texts : vector de vectores , representado como
-;;; una lista de listas .
-;;; Cada uno caracteriza un texto .
-;;; distance-measure : funcion de distancia
-;;; OUTPUT : Pares formados por el vector que identifica la categoria
-;;; de menor distancia , junto con el valor de dicha distancia
+;;; INPUT : categories: vector de vectores, representado como
+;;;                     una lista de listas
+;;;         texts:      vector de vectores, representado como
+;;;                     una lista de listas
+;;;         distance-measure: funcion de distancia
+;;; OUTPUT: Pares formados por el vector que identifica la categoria
+;;;         de menor distancia , junto con el valor de dicha distancia
 ;;;
 (defun get-vectors-category (categories texts distance-measure) ;;;;;;;;; FALTA ESTO
   (if (null texts)
@@ -166,6 +193,16 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;; Apartado 1
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; combine-elt-lst
+;;; Combina un elemento dado con todos los elementos de una lista
+;;;
+;;; INPUT: elem: elemento a combinar
+;;;        lst: lista con la que se quiere combinar el elemento
+;;;
+;;; OUTPUT: lista con las combinacion del elemento con cada uno de los
+;;;         de la lista
 (defun combine-elt-lst (elt lst)
   (cond
    ((and (null elt) (null lst)) nil)
@@ -185,6 +222,15 @@
 (combine-elt-lst nil '(a b))
 
 ;;;;;;; Apartado 2
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; combine-lst-lst
+;;; Calcula el producto cartesiano de dos listas
+;;;
+;;; INPUT: lst1: primera lista
+;;;        lst2: segunda lista
+;;;
+;;; OUTPUT: producto cartesiano de las dos listas
 (defun combine-lst-lst (lst1 lst2)
   (cond
    ((and (null lst1) (null lst2)) nil)
@@ -218,6 +264,15 @@
 
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; combine-list-of-lsts
+;;; Calcula todas las posibles disposiciones de elementos
+;;; pertenecientes a N listas de forma que en cada disposicion 
+;;; aparezca unicamente un elemento de cada lista
+;;;
+;;; INPUT: lstolsts: lista de listas
+;;;
+;;; OUTPUT: lista con todas las posibles combinaciones de elementos
 (defun combine-list-of-lsts (lstoflsts)
   (if (null (first lstoflsts))
       '(nil)
