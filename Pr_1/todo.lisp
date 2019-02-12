@@ -119,8 +119,8 @@
                           (cons (funcall distance-measure (rest (first categories)) (rest text)) nil))))
       (cond
        ((null min-parcial) nuevo-min)
-       ((< (first (rest nuevo-min))) (first (rest min-parcial)) nuevo-min)
-       (T (min-parcial))))))
+       ((< (first (rest nuevo-min)) (first (rest min-parcial))) nuevo-min)
+       (T min-parcial)))))
     
   
 
@@ -198,10 +198,23 @@
 (combine-lst-lst nil '(a b c))
 
 ;;;;;;;;;; Apartado 3
-(defun combine-list-of-lsts (lstolsts) ;;;;;;;;;; FALTA
-  (if (null lstoflsts)
+
+(defun combine-elt-cons (elt list-of-cons)
+  (cons elt list-of-cons))
+
+(defun combine-lst-with-list-of-cons (list list-of-cons)
+  (if (null list)
       nil
-    nil))
+    (cons
+     (combine-elt-cons (first list) list-of-cons)
+     (combine-lst-with-list-of-cons (rest list) list-of-cons))))
+
+
+
+(defun combine-list-of-lsts (lstoflsts)
+  (if (null lstoflsts)
+      '(nil)
+    (combine-lst-with-list-of-cons (first lstoflsts) (combine-list-of-lists (rest lstoslsts)))))
 
 
 (combine-list-of-lsts '((a b c) (+ -) (1 2 3 4)))
