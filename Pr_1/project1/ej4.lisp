@@ -6,48 +6,69 @@
 (defconstant +or+ 'v)
 (defconstant +not+ '!)
 
-
+;; True si x es True o NIL
 (defun truth-value-p (x)
   (or (eql x T) (eql x NIL)))
 
+;; Comprueba que el conector es 1-ario
 (defun unary-connector-p (x)
   (eql x +not+))
 
+;; Comprueba que el conector el binario
 (defun binary-connector-p (x)
   (or (eql x +bicond+)
       (eql x +cond+)))
 
+;; Comprueba que el conector es n-ario
 (defun n-ary-connector-p (x)
   (or (eql x +and+)
       (eql x +or+)))
 
+;; Comprueba si el conector es <=>
 (defun bicond-connector-p (x)
   (eql x +bicond+))
 
+;; Comprueba si el conector es =>
 (defun cond-connector-p (x)
   (eql x +cond+))
 
+;; Comprueba si es un conector
 (defun connector-p (x)
   (or (unary-connector-p x)
       (binary-connector-p x)
       (n-ary-connector-p x)))
 
+;; Comprueba si es un atomo
 (defun positive-literal-p (x)
   (and (atom x)
        (not (truth-value-p x))
        (not (connector-p x))))
 
+;; Comprueba si es un not
 (defun negative-literal-p (x)
   (and (listp x)
        (eql +not+ (first x))
        (null (rest (rest x)))
        (positive-literal-p (second x))))
 
+;; Comprueba si es un atomo o un not
 (defun literal-p (x)
   (or (positive-literal-p x)
       (negative-literal-p x)))
 
+;; Comprueba si la lista es un and unicamente
+(defun only-and-list (x)
+	(and (= (first x) +and+)
+		(null (rest x))))
+
 ;; Apartado 1
+
+(defun expand-truth-tree-aux (nodos expresion)
+	(cond
+		((null expresion) NIL)
+		((only-and-list expresion) nodos)
+		(T (cond 
+			
 
 ;; Apartado 2
 
