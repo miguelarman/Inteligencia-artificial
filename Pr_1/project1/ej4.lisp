@@ -47,13 +47,17 @@
   (or (positive-literal-p x)
       (negative-literal-p x)))
 
+;; Apartado 1
+
+;; Apartado 2
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; TRUTH-TREE
 ;; Recibe una expresion y construye su arbol de verdad para comprobar
 ;; si es SAT o UNSAT
 ;; PARAMS : exp - expresion a analizar .
 ;; RETURN : t - la expresion es SAT
-;; nil - la expresion es UNSAT
+;;          nil - la expresion es UNSAT
 
 (defun truth-tree (exp)
   
