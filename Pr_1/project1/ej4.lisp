@@ -58,17 +58,49 @@
 
 ;; Comprueba si la lista es un and unicamente
 (defun only-and-list (x)
-	(and (= (first x) +and+)
-		(null (rest x))))
+  (and (= (first x) +and+)
+       (null (rest x))))
 
 ;; Apartado 1
 
+(defun desarrollar-cond (expresion)
+  (cons '^
+        (cons (cons 'v
+                    (cons (cons '!
+                                (cons (first (rest expresion)) nil))
+                          (cons (first (rest (rest expresion))) nil)))
+              nil)))
+
+(defun desarrollar-bicond (expresion)
+  (cons '^
+        (cons (cons '=>
+                    (cons (first (rest expresion))
+                          (cons (first (rest (rest expresion)))
+                                nil)))
+              (cons '=>
+                    (cons (first (rest (rest expresion)))
+                          (cons (first (rest expresion))
+                                nil))))))
+              
+
 (defun expand-truth-tree-aux (nodos expresion)
-	(cond
-		((null expresion) NIL)
-		((only-and-list expresion) nodos)
-		(T (cond 
-			
+  (cond
+   ((null expresion) NIL)
+   ((only-and-list expresion) nodos)
+   (T (cond
+       ((cond-connector (first expresion)) (expand-truth-tree-aux nodos (desarrollar-cond expresion)))
+       ((bicond-connector (first expresion)) (expand-truth-tree-aux nodos (desarrollar-bicond expresion)))
+       
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
 
 ;; Apartado 2
 
