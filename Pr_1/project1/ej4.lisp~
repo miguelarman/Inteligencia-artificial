@@ -77,19 +77,19 @@
                     (cons (first (rest expresion))
                           (cons (first (rest (rest expresion)))
                                 nil)))
-              (cons(cons '=>
+              (cons '=>
                     (cons (first (rest (rest expresion)))
                           (cons (first (rest expresion))
-                                nil)))nil))))
+                                nil))))))
               
 
-;(defun expand-truth-tree-aux (nodos expresion)
- ; (cond
-  ; ((null expresion) NIL)
-   ;((only-and-list expresion) nodos)
-   ;(T (cond
-    ;   ((cond-connector (first expresion)) (expand-truth-tree-aux nodos (desarrollar-cond expresion)))
-     ;  ((bicond-connector (first expresion)) (expand-truth-tree-aux nodos (desarrollar-bicond expresion)))))))
+(defun expand-truth-tree-aux (nodos expresion)
+  (cond
+   ((null expresion) NIL)
+   ((only-and-list expresion) nodos)
+   (T (cond
+       ((cond-connector (first expresion)) (expand-truth-tree-aux nodos (desarrollar-cond expresion)))
+       ((bicond-connector (first expresion)) (expand-truth-tree-aux nodos (desarrollar-bicond expresion)))
        
         
         
@@ -112,5 +112,5 @@
 ;; RETURN : t - la expresion es SAT
 ;;          nil - la expresion es UNSAT
 
-
+(defun truth-tree (exp)
   
