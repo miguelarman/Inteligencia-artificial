@@ -95,6 +95,45 @@
    (= (first list) +and+)
    (null (rest list))))
 
+(defun par-vacio (par)
+  (and
+   (null (first par))
+   (null (first (rest par)))))
+
+(defun lista-pares-vacia (lista)
+  (and
+   (par-vacio (first lista))
+   (null (rest lista))))
+   
+   
+(defun combinar-listas-or (pares1 pares2)
+  (cond
+   ((lista-pares-vacia pares1) pares2)
+   ((lista-pares-vacia pares2) pares1)
+   (T (append pares1 pares2))))
+
+
+
+
+
+(defun combinar-par-par-aux (par1 par2)
+  (let
+      ((atomos-positivos (append (first par1) (first par2)))
+       (atomos-negativos (append (first (rest par1))
+                                 (first (rest par2)))))
+    (cons atomos-positivos (cons atomos-negativos nil))))
+
+(defun combinar-par-lista-aux (par pares)
+  (if (null pares)
+      nil
+    (cons (combinar-par-par-aux par (first pares))
+          (combinar-par-lista-aux par (rest pares)))))
+  
+(defun combinar-listas-and (pares1 pares2)
+  (if (null pares1)
+      nil
+    (append (combinar-par-lista-aux (first pares1) pares2)
+            (combinar-listas-and (rest pares1) pares2))))
 
 (defun expand-truth-tree-aux (nodos expresion)
   (cond

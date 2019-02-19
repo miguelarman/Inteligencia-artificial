@@ -1,0 +1,20 @@
+Pseudocódigo del ejercicio 3 de la práctica de IA
+
+expand-truth-tree-aux (expresion):
+  // Funcion aux que elimina condicionales y arregla la expresion
+  // Funcion que hace demorgan y deja todos los negativos en átomos
+
+  // Casos base:
+  si la expresion es +and+: <<<<<<< caso base
+    devuelve ((nil nil))
+  si la expresion es +and+ y atomo:
+    devuelve el atomo
+  si la expresion es un +and+ con varios elementos:
+    combinar-and (funcion +and+ (primero lista)) (funcion +and+ (resto lista))
+  si la expresion es un +and+ con un solo elemento:
+    si el elemento es un +and+:
+      elimina el +and+ repetido y llama a la funcion sobre esa expresion
+    si el elemento es un +or+:
+      combinar-or (funcion +and+ (primero lista)) (funcion +and+ +or+ (resto lista))
+    si el elemento en un +nop+ literal:
+      devuelve el elemento negado
