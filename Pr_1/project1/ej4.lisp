@@ -63,11 +63,19 @@
 
 ;; Apartado 1
 
+(defun negar (expresion)
+  (cond
+   ((positive-literal-p expresion)
+    (cons '!
+          (cons expresion nil)))
+   ((unary-connector-p (first expresion)) (first (rest expresion)))
+   (T (cons '!
+            (cons expresion nil)))))
+
 (defun desarrollar-cond (expresion)
   (cons '^
         (cons (cons 'v
-                    (cons (cons '!
-                                (cons (first (rest expresion)) nil))
+                    (cons (negar (first (rest expresion)))
                           (cons (first (rest (rest expresion))) nil)))
               nil)))
 
@@ -77,20 +85,25 @@
                     (cons (first (rest expresion))
                           (cons (first (rest (rest expresion)))
                                 nil)))
-              (cons(cons '=>
-                    (cons (first (rest (rest expresion)))
+              (cons (cons '=>
+                          (cons (first (rest (rest expresion)))
                           (cons (first (rest expresion))
                                 nil)))nil))))
               
+(defun only-and-list (list)
+  (and
+   (= (first list) +and+)
+   (null (rest list))))
 
-;(defun expand-truth-tree-aux (nodos expresion)
- ; (cond
-  ; ((null expresion) NIL)
-   ;((only-and-list expresion) nodos)
-   ;(T (cond
-    ;   ((cond-connector (first expresion)) (expand-truth-tree-aux nodos (desarrollar-cond expresion)))
-     ;  ((bicond-connector (first expresion)) (expand-truth-tree-aux nodos (desarrollar-bicond expresion)))))))
-       
+
+(defun expand-truth-tree-aux (nodos expresion)
+  (cond
+   ((null expresion) NIL)
+   ((only-and-list expresion) nodos)
+   (T (cond
+       ((cond-connector (first expresion)) (expand-truth-tree-aux nodos (desarrollar-cond expresion)))
+       ((bicond-connector (first expresion)) (expand-truth-tree-aux nodos (desarrollar-bicond expresion)))
+       (nil)))))
         
         
         
