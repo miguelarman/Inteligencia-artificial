@@ -92,14 +92,14 @@
 (defun desarrollar-cond (expresion)
   (cons '^
         (cons (cons 'v
-                    (cons (negar (first (rest expresion)))
-                          (cons (first (rest (rest expresion))) nil)))
+                    (cons (negar (sintetizar-cond (first (rest expresion))))
+                          (cons (sintetizar-cond (first (rest (rest expresion)))) nil)))
               nil)))
 
 ;;Desarrolla los <=>
 (defun desarrollar-bicond (expresion)
-  (let ((a (first (rest expresion)))
-    (b (first (rest (rest expresion)))))
+  (let ((a (sintetizar-bicond (first (rest expresion))))
+    (b (sintetizar-bicond (first (rest (rest expresion))))))
     (cons +or+
           (cons 
            (cons +and+
@@ -107,11 +107,31 @@
            (cons(cons +and+
                  (cons (negar a) (cons (negar b) nil)))nil)))))
 
-;(defun sintetizar-bicond (expresion)
+
+(defun sintetizar-bicond (expresion)
+  (cond
+   ((or (positive-literal-p expresion) (negative-literal-p expresion))
+    expresion)
+   ((bicond-connector-p (first expresion)) (desarrollar-bicond expresion))
+   (T
+    (cons 
+     (first expresion) 
+     (funcion-lista (rest expresion) #'sintetizar-bicond)))))
+
+(defun sintetizar-cond (expresion)
+  (cond
+   ((or (positive-literal-p expresion) (negative-literal-p expresion))
+    expresion)
+   ((cond-connector-p (first expresion)) (desarrollar-cond expresion))
+   (T
+    (cons 
+     (first expresion) 
+     (funcion-lista (rest expresion) #'sintetizar-cond)))))
+   
 
 ;;Simplifica la expresión a and, or y negaciones atomicas
 ;(defun sintetizar (expresion)
-;  (let (())
+ ; (let (())
         
               
 (defun only-and-list (list)
