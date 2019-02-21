@@ -58,7 +58,7 @@
 
 ;; Comprueba si la lista es un and unicamente
 (defun only-and-list (x)
-  (and (= (first x) +and+)
+  (and (eql (first x) +and+)
        (null (rest x))))
 
 ;; Apartado 1
@@ -89,11 +89,6 @@
                           (cons (first (rest (rest expresion)))
                           (cons (first (rest expresion))
                                 nil)))nil))))
-              
-(defun only-and-list (list)
-  (and
-   (= (first list) +and+)
-   (null (rest list))))
 
 (defun par-vacio (par)
   (and
@@ -135,13 +130,41 @@
     (append (combinar-par-lista-aux (first pares1) pares2)
             (combinar-listas-and (rest pares1) pares2))))
 
+
+(defun lista-contiene-elemento (elt lista)
+  (cond
+   ((null lista) nil)
+   ((eql elt (first lista)) T)
+   (T (lista-contiene-elemento elt (rest lista)))))
+
+
+(defun interseccion-listas-vacia (lista1 lista2)
+  (cond
+   ((null lista1) T)
+   ((lista-contiene-elemento (first lista1) lista2) nil)
+   (T (interseccion-listas-vacia (rest lista1) lista2))))
+
+
+(defun par-satisfacible (par) 
+  (cond
+   ((null par) nil)
+   ((par-vacio par) T)
+   (T (interseccion-listas-vacia (first par) (first (rest par))))))
+
+
+(defun lista-satisfacible (lista)
+  (cond
+   ((null lista) T)
+   ((par-satisfacible (first lista)) (lista-satisfacible (rest lista)))
+   (T nil)))
+
 (defun expand-truth-tree-aux (nodos expresion)
   (cond
    ((null expresion) NIL)
    ((only-and-list expresion) nodos)
    (T (cond
-       ((cond-connector (first expresion)) (expand-truth-tree-aux nodos (desarrollar-cond expresion)))
-       ((bicond-connector (first expresion)) (expand-truth-tree-aux nodos (desarrollar-bicond expresion)))
+       ((cond-connector-p (first expresion)) (expand-truth-tree-aux nodos (desarrollar-cond expresion)))
+       ((bicond-connector-p (first expresion)) (expand-truth-tree-aux nodos (desarrollar-bicond expresion)))
        (nil)))))
         
         
