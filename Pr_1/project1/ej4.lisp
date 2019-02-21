@@ -158,24 +158,17 @@
    ((par-satisfacible (first lista)) (lista-satisfacible (rest lista)))
    (T nil)))
 
-(defun expand-truth-tree-aux (nodos expresion)
+; Arreglar esta funcion para que de una expresion correcta (se normaliza en la grande)
+; devuelva todas las ramas del arbol de decision
+(defun expand-truth-tree-aux (expresion)
   (cond
    ((null expresion) NIL)
-   ((only-and-list expresion) nodos)
    (T (cond
-       ((cond-connector-p (first expresion)) (expand-truth-tree-aux nodos (desarrollar-cond expresion)))
-       ((bicond-connector-p (first expresion)) (expand-truth-tree-aux nodos (desarrollar-bicond expresion)))
+       ((cond-connector-p (first expresion)) (expand-truth-tree-aux (desarrollar-cond expresion)))
+       ((bicond-connector-p (first expresion)) (expand-truth-tree-aux (desarrollar-bicond expresion)))
        (nil)))))
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
+  
 
 ;; Apartado 2
 
@@ -187,5 +180,8 @@
 ;; RETURN : t - la expresion es SAT
 ;;          nil - la expresion es UNSAT
 
-
-  
+(defun truth-tree (expresion)
+  (lista-satisfacible
+   (expand-truth-tree-aux
+    (demorgan-recursiva
+     (normaliza-expresion expresion)))))
