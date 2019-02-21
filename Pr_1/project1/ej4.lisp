@@ -133,11 +133,6 @@
 ;(defun sintetizar (expresion)
  ; (let (())
         
-              
-(defun only-and-list (list)
-  (and
-   (= (first list) +and+)
-   (null (rest list))))
 
 (defun par-vacio (par)
   (and
