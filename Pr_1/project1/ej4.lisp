@@ -65,11 +65,11 @@
 
 ;;Evalua una funcion en  una lista de sentencias
 (defun funcion-lista (lista funcion)
-  (cond ((null lista) NIL)
-        (T 
-         (cons 
-          (funcall funcion (first lista))
-          (funcion-lista (rest lista) funcion)))))
+  (cond
+   ((null lista) NIL)
+   (T (cons 
+       (funcall funcion (first lista))
+       (funcion-lista (rest lista) funcion)))))
         
  ;;Permite que todas las negaciones sean atomicas
 (defun negar (expresion)
@@ -141,7 +141,11 @@
 
 ;;Simplifica la expresión a and, or y negaciones atomicas
 (defun sintetizar (expresion)
-  (sintetizar-negar (sintetizar-cond (sintetizar-bicond expresion))))
+  (cons +and+
+        (cons (sintetizar-negar
+               (sintetizar-cond
+                (sintetizar-bicond expresion)))
+              nil)))
   
         
 
@@ -213,17 +217,64 @@
    ((par-satisfacible (first lista)) (lista-satisfacible (rest lista)))
    (T nil)))
 
-; Arreglar esta funcion para que de una expresion correcta (se normaliza en la grande)
-; devuelva todas las ramas del arbol de decision
+(defun lista-de-atomo (atomo)
+  (cond
+   ((positive-literal-p atomo) (cons (cons
+                                      (cons atomo nil)
+                                      (cons '() nil))
+                                     nil))
+   ((negative-literal-p atomo) (cons (cons nil
+                                           (cons (cons (first (rest atomo)) nil) nil))
+                                     nil))
+   (T 'err)))
+
+
 (defun expand-truth-tree-aux (expresion)
   (cond
-   ((null expresion) NIL)
-   (T (cond
-       ((cond-connector-p (first expresion)) (expand-truth-tree-aux (desarrollar-cond expresion)))
-       ((bicond-connector-p (first expresion)) (expand-truth-tree-aux (desarrollar-bicond expresion)))
-       (nil)))))
-        
-  
+   ((only-and-list expresion) '((nil nil)))
+   
+  ;la expresion es +and+ y atomo, devuelve el atomo
+   ((and (eql +and+ (first expresion))
+         (positive-literal-p (first (rest expresion)))
+         (null (rest (rest expresion))))
+    (lista-de-atomo (first (rest expresion))))
+     
+   ;la expresion es un +and+ con varios elementos
+   ((and (eql +and+ (first expresion))
+         (not (null (rest (rest expresion)))))
+    (combinar-listas-and (expand-truth-tree-aux (cons +and+
+                                               (cons (first (rest expresion)) nil)))
+                  (expand-truth-tree-aux (cons +and+
+                                               (rest (rest expresion))))))
+   
+   ; la expresion es un +and+ con un solo elemento
+   
+   ; el elemento empieza por un +and+
+   ((and (eql +and+ (first expresion))
+         (null (rest (rest expresion)))
+         (eql +and+ (first (first (rest expresion)))))
+    (expand-truth-tree-aux (first (rest expresion))))
+   
+   ; el elemento empieza por un +or+
+   ((and (eql +and+ (first expresion))
+         (null (rest (rest expresion)))
+         (eql +or+ (first (first (rest expresion)))))
+    (combinar-listas-or (expand-truth-tree-aux (cons +and+
+                                              (cons
+                                               (first (rest (first (rest expresion)))) nil)))
+                 (expand-truth-tree-aux (cons +and+
+                                              (cons
+                                               (cons +or+
+                                                     (rest (rest (first (rest expresion)))))
+                                               nil)))))
+   
+   ; el elemento en un +nop+ literal
+   ((and (eql +and+ (first expresion))
+         (null (rest (rest expresion)))
+         (negative-literal-p (first (rest expresion))))
+    (lista-de-atomo (first (rest expresion))))
+   
+   (T '((nil nil)))))
 
 ;; Apartado 2
 
@@ -238,5 +289,4 @@
 (defun truth-tree (expresion)
   (lista-satisfacible
    (expand-truth-tree-aux
-    (demorgan-recursiva
-     (normaliza-expresion expresion)))))
+    (sintetizar expresion))))
