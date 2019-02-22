@@ -98,7 +98,7 @@
 
 ;;Desarrolla los <=>
 (defun desarrollar-bicond (expresion)
-  (cons +and+ (cons
+  (cons +and+ 
         (let ((a (sintetizar-bicond (first (rest expresion))))
               (b (sintetizar-bicond (first (rest (rest expresion))))))
           (cons +or+
@@ -106,7 +106,7 @@
                  (cons +and+
                        (cons a (cons b nil)))
                  (cons(cons +and+
-                            (cons (negar a) (cons (negar b) nil)))nil)))) nil)))
+                            (cons (negar a) (cons (negar b) nil)))nil))))))
 
 
 (defun sintetizar-bicond (expresion)
@@ -119,7 +119,6 @@
      (first expresion) 
      (funcion-lista (rest expresion) #'sintetizar-bicond)))))
 
-
 (defun sintetizar-cond (expresion)
   (cond
    ((or (positive-literal-p expresion) (negative-literal-p expresion))
@@ -131,18 +130,11 @@
      (funcion-lista (rest expresion) #'sintetizar-cond)))))
 
 (defun sintetizar-negar (expresion)
-  (cond
-   ((or (positive-literal-p expresion) (negative-literal-p expresion))
-    expresion)
-   ((eql +not+ (first expresion)) (negar (first(rest expresion))))
-   (T
-    (cons (first expresion) (funcion-lista (rest expresion) #'sintetizar-negar)))))
   
 
 ;;Simplifica la expresión a and, or y negaciones atomicas
 (defun sintetizar (expresion)
-  (sintetizar-negar (sintetizar-cond (sintetizar-bicond expresion))))
-  
+ ; (let (())
         
 
 (defun par-vacio (par)
