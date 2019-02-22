@@ -134,9 +134,9 @@
   (cond
    ((or (positive-literal-p expresion) (negative-literal-p expresion))
     expresion)
-   ((eql +not+ (first expresion)) (negar (first(rest expresion))))
-   (T
-    (cons (first expresion) (funcion-lista (rest expresion) #'sintetizar-negar)))))
+   ((eql +not+ (first expresion)) (negar (first (rest expresion))))
+   (T (cons (first expresion)
+            (funcion-lista (rest expresion) #'sintetizar-negar)))))
   
 
 ;;Simplifica la expresión a and, or y negaciones atomicas
