@@ -63,6 +63,148 @@
        (null (rest x))))
 
 ;; Apartado 1
+  
+        
+
+(defun par-vacio (par)
+  (and
+   (null (first par))
+   (null (first (rest par)))))
+
+(defun lista-pares-vacia (lista)
+  (and
+   (par-vacio (first lista))
+   (null (rest lista))))
+   
+   
+(defun combinar-listas-or (pares1 pares2)
+  (cond
+   ((lista-pares-vacia pares1) pares2)
+   ((lista-pares-vacia pares2) pares1)
+   (T (append pares1 pares2))))
+
+
+
+
+
+(defun combinar-par-par-aux (par1 par2)
+  (let
+      ((atomos-positivos (append (first par1) (first par2)))
+       (atomos-negativos (append (first (rest par1))
+                                 (first (rest par2)))))
+    (cons atomos-positivos (cons atomos-negativos nil))))
+
+(defun combinar-par-lista-aux (par pares)
+  (if (null pares)
+      nil
+    (cons (combinar-par-par-aux par (first pares))
+          (combinar-par-lista-aux par (rest pares)))))
+  
+(defun combinar-listas-and (pares1 pares2)
+  (if (null pares1)
+      nil
+    (append (combinar-par-lista-aux (first pares1) pares2)
+            (combinar-listas-and (rest pares1) pares2))))
+
+
+
+
+(defun lista-de-atomo (atomo)
+  (cond
+   ((positive-literal-p atomo) (cons (cons
+                                      (cons atomo nil)
+                                      (cons '() nil))
+                                     nil))
+   ((negative-literal-p atomo) (cons (cons nil
+                                           (cons (cons (first (rest atomo)) nil) nil))
+                                     nil))
+   (T 'err)))
+
+
+(defun expand-truth-tree-aux (expresion)
+  (cond
+   ((only-and-list expresion) '((nil nil)))
+   
+  ;la expresion es +and+ y atomo, devuelve el atomo
+   ((and (positive-literal-p (first (rest expresion)))
+         (null (rest (rest expresion))))
+    (lista-de-atomo (first (rest expresion))))
+     
+   ;la expresion es un +and+ con varios elementos
+   ((and (not (null (rest (rest expresion)))))
+    (combinar-listas-and (expand-truth-tree-aux (cons +and+
+                                                      (cons (first (rest expresion)) nil)))
+                         (expand-truth-tree-aux (cons +and+
+                                                      (rest (rest expresion))))))
+   
+   ; la expresion es un +and+ con un solo elemento
+   
+   ; el elemento empieza por otro +and+
+   ((and (eql +and+ (first expresion))
+         (null (rest (rest expresion)))
+         (eql +and+ (first (first (rest expresion)))))
+    (expand-truth-tree-aux (first (rest expresion))))
+   
+   ; el elemento empieza por un +or+
+   ; Caso base (^ (V))
+   ((and (eql +and+ (first expresion))
+         (null (rest (rest expresion)))
+         (null (rest (first (rest expresion)))) ; Nueva linea
+         (eql +or+ (first (first (rest expresion)))))
+    '((nil nil)))
+   
+   ((and (eql +and+ (first expresion))
+         (null (rest (rest expresion)))
+         (eql +or+ (first (first (rest expresion)))))
+    (combinar-listas-or (expand-truth-tree-aux (cons +and+
+                                              (cons
+                                               (first (rest
+                                                       (first (rest expresion)))) nil)))
+                        (expand-truth-tree-aux (cons +and+
+                                                     (cons
+                                                      (cons +or+
+                                                            (rest (rest
+                                                                   (first (rest expresion)))))
+                                                      nil)))))
+    
+    
+       
+   
+   ; el elemento en un literal negado
+   ((and (null (rest (rest expresion)))
+         (negative-literal-p (first (rest expresion))))
+    (lista-de-atomo (first (rest expresion))))
+   
+   (T nil)))
+
+;; Apartado 2
+
+(defun lista-contiene-elemento (elt lista)
+  (cond
+   ((null lista) nil)
+   ((eql elt (first lista)) T)
+   (T (lista-contiene-elemento elt (rest lista)))))
+
+
+(defun interseccion-listas-vacia (lista1 lista2)
+  (cond
+   ((null lista1) T)
+   ((lista-contiene-elemento (first lista1) lista2) nil)
+   (T (interseccion-listas-vacia (rest lista1) lista2))))
+
+
+(defun par-satisfacible (par) 
+  (cond
+   ((null par) nil)
+   ((par-vacio par) T)
+   (T (interseccion-listas-vacia (first par) (first (rest par))))))
+
+
+(defun lista-satisfacible (lista)
+  (cond
+   ((null lista) T)
+   ((par-satisfacible (first lista)) (lista-satisfacible (rest lista)))
+   (T nil)))
 
 ;;Evalua una funcion en  una lista de sentencias
 (defun funcion-lista (lista funcion)
@@ -146,146 +288,6 @@
                (sintetizar-cond
                 (sintetizar-bicond expresion)))
               nil)))
-  
-        
-
-(defun par-vacio (par)
-  (and
-   (null (first par))
-   (null (first (rest par)))))
-
-(defun lista-pares-vacia (lista)
-  (and
-   (par-vacio (first lista))
-   (null (rest lista))))
-   
-   
-(defun combinar-listas-or (pares1 pares2)
-  (cond
-   ((lista-pares-vacia pares1) pares2)
-   ((lista-pares-vacia pares2) pares1)
-   (T (append pares1 pares2))))
-
-
-
-
-
-(defun combinar-par-par-aux (par1 par2)
-  (let
-      ((atomos-positivos (append (first par1) (first par2)))
-       (atomos-negativos (append (first (rest par1))
-                                 (first (rest par2)))))
-    (cons atomos-positivos (cons atomos-negativos nil))))
-
-(defun combinar-par-lista-aux (par pares)
-  (if (null pares)
-      nil
-    (cons (combinar-par-par-aux par (first pares))
-          (combinar-par-lista-aux par (rest pares)))))
-  
-(defun combinar-listas-and (pares1 pares2)
-  (if (null pares1)
-      nil
-    (append (combinar-par-lista-aux (first pares1) pares2)
-            (combinar-listas-and (rest pares1) pares2))))
-
-
-(defun lista-contiene-elemento (elt lista)
-  (cond
-   ((null lista) nil)
-   ((eql elt (first lista)) T)
-   (T (lista-contiene-elemento elt (rest lista)))))
-
-
-(defun interseccion-listas-vacia (lista1 lista2)
-  (cond
-   ((null lista1) T)
-   ((lista-contiene-elemento (first lista1) lista2) nil)
-   (T (interseccion-listas-vacia (rest lista1) lista2))))
-
-
-(defun par-satisfacible (par) 
-  (cond
-   ((null par) nil)
-   ((par-vacio par) T)
-   (T (interseccion-listas-vacia (first par) (first (rest par))))))
-
-
-(defun lista-satisfacible (lista)
-  (cond
-   ((null lista) T)
-   ((par-satisfacible (first lista)) (lista-satisfacible (rest lista)))
-   (T nil)))
-
-(defun lista-de-atomo (atomo)
-  (cond
-   ((positive-literal-p atomo) (cons (cons
-                                      (cons atomo nil)
-                                      (cons '() nil))
-                                     nil))
-   ((negative-literal-p atomo) (cons (cons nil
-                                           (cons (cons (first (rest atomo)) nil) nil))
-                                     nil))
-   (T 'err)))
-
-
-(defun expand-truth-tree-aux (expresion)
-  (cond
-   ((only-and-list expresion) '((nil nil)))
-   
-  ;la expresion es +and+ y atomo, devuelve el atomo
-   ((and (positive-literal-p (first (rest expresion)))
-         (null (rest (rest expresion))))
-    (lista-de-atomo (first (rest expresion))))
-     
-   ;la expresion es un +and+ con varios elementos
-   ((and (not (null (rest (rest expresion)))))
-    (combinar-listas-and (expand-truth-tree-aux (cons +and+
-                                                      (cons (first (rest expresion)) nil)))
-                         (expand-truth-tree-aux (cons +and+
-                                                      (rest (rest expresion))))))
-   
-   ; la expresion es un +and+ con un solo elemento
-   
-   ; el elemento empieza por otro +and+
-   ((and (eql +and+ (first expresion))
-         (null (rest (rest expresion)))
-         (eql +and+ (first (first (rest expresion)))))
-    (expand-truth-tree-aux (first (rest expresion))))
-   
-   ; el elemento empieza por un +or+
-   ; Caso base (^ (V))
-   ((and (eql +and+ (first expresion))
-         (null (rest (rest expresion)))
-         (null (rest (first (rest expresion)))) ; Nueva linea
-         (eql +or+ (first (first (rest expresion)))))
-    '((nil nil)))
-   
-   ((and (eql +and+ (first expresion))
-         (null (rest (rest expresion)))
-         (eql +or+ (first (first (rest expresion)))))
-    (combinar-listas-or (expand-truth-tree-aux (cons +and+
-                                              (cons
-                                               (first (rest
-                                                       (first (rest expresion)))) nil)))
-                        (expand-truth-tree-aux (cons +and+
-                                                     (cons
-                                                      (cons +or+
-                                                            (rest (rest
-                                                                   (first (rest expresion)))))
-                                                      nil)))))
-    
-    
-       
-   
-   ; el elemento en un literal negado
-   ((and (null (rest (rest expresion)))
-         (negative-literal-p (first (rest expresion))))
-    (lista-de-atomo (first (rest expresion))))
-   
-   (T nil)))
-
-;; Apartado 2
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; TRUTH-TREE
