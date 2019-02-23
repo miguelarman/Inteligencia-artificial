@@ -19,6 +19,7 @@
   (or (eql x +bicond+)
       (eql x +cond+)))
 
+
 ;; Comprueba que el conector es n-ario
 (defun n-ary-connector-p (x)
   (or (eql x +and+)
@@ -58,7 +59,7 @@
 
 ;; Comprueba si la lista es un and unicamente
 (defun only-and-list (x)
-  (and (eql (first x) +and+)
+  (and (eql +and+ (first x))
        (null (rest x))))
 
 ;; Apartado 1
@@ -240,9 +241,9 @@
    ;la expresion es un +and+ con varios elementos
    ((and (not (null (rest (rest expresion)))))
     (combinar-listas-and (expand-truth-tree-aux (cons +and+
-                                               (cons (first (rest expresion)) nil)))
-                  (expand-truth-tree-aux (cons +and+
-                                               (rest (rest expresion))))))
+                                                      (cons (first (rest expresion)) nil)))
+                         (expand-truth-tree-aux (cons +and+
+                                                      (rest (rest expresion))))))
    
    ; la expresion es un +and+ con un solo elemento
    
@@ -253,7 +254,14 @@
     (expand-truth-tree-aux (first (rest expresion))))
    
    ; el elemento empieza por un +or+
-   ((and (null (rest (rest expresion)))
+   ; Caso base (^ (V))
+   ((and (eql +and+ (first expresion))
+         (null (rest (rest expresion)))
+         (eql +or+ (first (first (rest expresion)))))
+    '((nil nil)))
+   
+   ((and (eql +and+ (first expresion))
+         (null (rest (rest expresion)))
          (eql +or+ (first (first (rest expresion)))))
     (combinar-listas-or (expand-truth-tree-aux (cons +and+
                                               (cons
@@ -265,6 +273,9 @@
                                                             (rest (rest
                                                                    (first (rest expresion)))))
                                                       nil)))))
+    
+    
+       
    
    ; el elemento en un literal negado
    ((and (null (rest (rest expresion)))
