@@ -111,8 +111,7 @@
 
 (defun sintetizar-bicond (expresion)
   (cond
-   ((or (positive-literal-p expresion) (negative-literal-p expresion))
-    expresion)
+   ((or (positive-literal-p expresion) (negative-literal-p expresion)) expresion)
    ((bicond-connector-p (first expresion)) (desarrollar-bicond expresion))
    (T
     (cons 
@@ -234,14 +233,12 @@
    ((only-and-list expresion) '((nil nil)))
    
   ;la expresion es +and+ y atomo, devuelve el atomo
-   ((and (eql +and+ (first expresion))
-         (positive-literal-p (first (rest expresion)))
+   ((and (positive-literal-p (first (rest expresion)))
          (null (rest (rest expresion))))
     (lista-de-atomo (first (rest expresion))))
      
    ;la expresion es un +and+ con varios elementos
-   ((and (eql +and+ (first expresion))
-         (not (null (rest (rest expresion)))))
+   ((and (not (null (rest (rest expresion)))))
     (combinar-listas-and (expand-truth-tree-aux (cons +and+
                                                (cons (first (rest expresion)) nil)))
                   (expand-truth-tree-aux (cons +and+
@@ -249,32 +246,32 @@
    
    ; la expresion es un +and+ con un solo elemento
    
-   ; el elemento empieza por un +and+
+   ; el elemento empieza por otro +and+
    ((and (eql +and+ (first expresion))
          (null (rest (rest expresion)))
          (eql +and+ (first (first (rest expresion)))))
     (expand-truth-tree-aux (first (rest expresion))))
    
    ; el elemento empieza por un +or+
-   ((and (eql +and+ (first expresion))
-         (null (rest (rest expresion)))
+   ((and (null (rest (rest expresion)))
          (eql +or+ (first (first (rest expresion)))))
     (combinar-listas-or (expand-truth-tree-aux (cons +and+
                                               (cons
-                                               (first (rest (first (rest expresion)))) nil)))
-                 (expand-truth-tree-aux (cons +and+
-                                              (cons
-                                               (cons +or+
-                                                     (rest (rest (first (rest expresion)))))
-                                               nil)))))
+                                               (first (rest
+                                                       (first (rest expresion)))) nil)))
+                        (expand-truth-tree-aux (cons +and+
+                                                     (cons
+                                                      (cons +or+
+                                                            (rest (rest
+                                                                   (first (rest expresion)))))
+                                                      nil)))))
    
-   ; el elemento en un +nop+ literal
-   ((and (eql +and+ (first expresion))
-         (null (rest (rest expresion)))
+   ; el elemento en un literal negado
+   ((and (null (rest (rest expresion)))
          (negative-literal-p (first (rest expresion))))
     (lista-de-atomo (first (rest expresion))))
    
-   (T '((nil nil)))))
+   (T nil)))
 
 ;; Apartado 2
 
