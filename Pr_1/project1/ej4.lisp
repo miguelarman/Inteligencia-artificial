@@ -175,7 +175,7 @@
          (negative-literal-p (first (rest expresion))))
     (lista-de-atomo (first (rest expresion))))
    
-   (T nil)))
+   (T '(((A) (A)))))) ;; Explicar esto
 
 ;; Apartado 2
 
