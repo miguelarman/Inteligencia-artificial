@@ -256,7 +256,8 @@
    ; el elemento empieza por un +or+
    ; Caso base (^ (V))
    ((and (eql +and+ (first expresion))
-         (null (rest (first (rest expresion))))
+         (null (rest (rest expresion)))
+         (null (rest (first (rest expresion)))) ; Nueva linea
          (eql +or+ (first (first (rest expresion)))))
     '((nil nil)))
    
