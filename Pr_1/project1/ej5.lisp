@@ -27,8 +27,36 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun lista-contiene (lista elt)
+  (if (null (find elt lista))
+      nil
+    T))
+
+(defun bfs-improved-aux (end queue net visitados)
+  (if (null queue) '()
+    (let* ((path (first queue))
+           (node (first path)))
+      (if (eql node end)
+          (reverse path)
+        (if (lista-contiene visitados node)
+            (bfs-improved-aux end
+                              (rest queue)
+                              net
+                              visitados)
+          (bfs-improved-aux end
+               (append (rest queue)
+                       (new-paths path node net))
+               net
+               (cons node visitados)))))))
+
+  
+  
+  
+  
+  
 (defun bfs-improved (end queue net)
-  nil)
+  (bfs-improved-aux end queue net nil))
+
 
 (defun shortest-path-improved (end queue net)
-  nil)
+  (bfs-improved end (list (list start)) net))

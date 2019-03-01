@@ -4,7 +4,8 @@
 
 (define-project :name :project1
   :modules (list (make-instance 'module :name "todo.lisp")
-                 (make-instance 'module :name "ej4.lisp"))
+                 (make-instance 'module :name "ej4.lisp")
+                 (make-instance 'module :name "ej5.lisp"))
   :projects nil
   :libraries nil
   :editable-files nil
