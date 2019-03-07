@@ -523,8 +523,9 @@
 (defun combine-lst-with-list-of-cons (list list-of-cons)
   (cond
    ((null list) nil)
-   ((null (first list-of-cons)) (cons (cons (first list) nil)
-                                      (combine-lst-with-list-of-cons (rest list) list-of-cons)))
+   ((null (first list-of-cons))
+    (cons (cons (first list) nil)
+          (combine-lst-with-list-of-cons (rest list) list-of-cons)))
    (T (append
        (combine-elt-cons (first list) list-of-cons)
        (combine-lst-with-list-of-cons (rest list) list-of-cons)))))
@@ -548,7 +549,11 @@
    (T (combine-lst-with-list-of-cons (first lstoflsts) (combine-list-of-lsts (rest lstoflsts))))))
 
 
-;; Ejercicio 4
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; EJERCICIO 4 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defconstant +bicond+ '<=>)
 (defconstant +cond+ '=>)
@@ -615,18 +620,23 @@
 ;; Apartado 1
   
         
-
+; Funcion auxiliar que devuelve el par vacio,
+; es decir, '(()())
 (defun par-vacio (par)
   (and
    (null (first par))
    (null (first (rest par)))))
 
+; Funcion auxiliar que comprueba si una lista es la
+; lista de pares vacia, es decir '((()()))
 (defun lista-pares-vacia (lista)
   (and
    (par-vacio (first lista))
    (null (rest lista))))
    
    
+;; Funcion auxiliar que combina dos listas representando
+;; dos expresiones unidas por un or
 (defun combinar-listas-or (pares1 pares2)
   (cond
    ((lista-pares-vacia pares1) pares2)
@@ -636,7 +646,7 @@
 
 
 
-
+; Funcion auxiliar que combina dos pares
 (defun combinar-par-par-aux (par1 par2)
   (let
       ((atomos-positivos (append (first par1) (first par2)))
@@ -644,12 +654,15 @@
                                  (first (rest par2)))))
     (cons atomos-positivos (cons atomos-negativos nil))))
 
+; Funcion auxiliar que combina listas con un par
 (defun combinar-par-lista-aux (par pares)
   (if (null pares)
       nil
     (cons (combinar-par-par-aux par (first pares))
           (combinar-par-lista-aux par (rest pares)))))
   
+;; Funcion auxiliar que combina dos listas representando
+;; dos expresiones unidas por un and
 (defun combinar-listas-and (pares1 pares2)
   (if (null pares1)
       nil
@@ -658,7 +671,7 @@
 
 
 
-
+; Funcion auxiliar que transforma un atomo en un par con solo ese atomo
 (defun lista-de-atomo (atomo)
   (cond
    ((positive-literal-p atomo) (cons (cons
@@ -731,34 +744,36 @@
 
 ;; Apartado 2
 
+;; Funcion auxiliar que comprueba si una lista contiene un elemento
 (defun lista-contiene-elemento (elt lista)
   (cond
    ((null lista) nil)
    ((eql elt (first lista)) T)
    (T (lista-contiene-elemento elt (rest lista)))))
 
-
+;; Funcion auxiliar que comprueba si existe un elemento en las dos listas
 (defun interseccion-listas-vacia (lista1 lista2)
   (cond
    ((null lista1) T)
    ((lista-contiene-elemento (first lista1) lista2) nil)
    (T (interseccion-listas-vacia (rest lista1) lista2))))
 
-
+;; Funcion auxiliar que comprueba si el par representa un nodo hoja SAT
 (defun par-satisfacible (par) 
   (cond
    ((null par) nil)
    ((par-vacio par) T)
    (T (interseccion-listas-vacia (first par) (first (rest par))))))
 
-
+;; Funcion que comprueba si una lista contiene un nodo SAT
 (defun lista-satisfacible (lista)
   (cond
    ((null lista) T)
-   ((par-satisfacible (first lista)) (lista-satisfacible (rest lista)))
+   ((par-satisfacible (first lista))
+    (lista-satisfacible (rest lista)))
    (T nil)))
 
-;;Evalua una funcion en  una lista de sentencias
+;; Evalua una funcion en  una lista de sentencias
 (defun funcion-lista (lista funcion)
   (cond
    ((null lista) NIL)
@@ -766,7 +781,7 @@
        (funcall funcion (first lista))
        (funcion-lista (rest lista) funcion)))))
         
-;;Permite que todas las negaciones sean atomicas
+;; Permite que todas las negaciones sean atomicas
 (defun negar (expresion)
   (cond
    ((positive-literal-p expresion)
@@ -856,6 +871,12 @@
    (expand-truth-tree-aux
     (sintetizar expresion))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; EJERCICIO 5 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Breadth-first-search in graphs
 ;;;
@@ -870,26 +891,27 @@
                      (new-paths path node net))
              net)))))
 
+; Funcion auxiliar usada por bfs
 (defun new-paths (path node net)
   (mapcar #'(lambda (n)
               (cons n path))
     (rest (assoc node net))))
-;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-
+;; Calcula el camino mas corto en un grafo entre dos nodos
 (defun shortest-path (start end net)
   (bfs end (list (list start)) net))
 
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Funcion auxiliar que comprueba si una lista contiene un elemento
 (defun lista-contiene (lista elt)
   (if (null (find elt lista))
       nil
     T))
 
+;; Funcion auxiliar que implementa bfs con una lista auxiliar de nodos
+;; visitados para eliminar bucles infinitos
 (defun bfs-improved-aux (end queue net visitados)
   (if (null queue) '()
     (let* ((path (first queue))
@@ -908,14 +930,11 @@
                (cons node visitados)))))))
 
   
-  
-  
-  
-  
+;; Funcion que llama a la auxiliar con una lista de nodos visitados vacía  
 (defun bfs-improved (end queue net)
   (bfs-improved-aux end queue net nil))
 
-
+;; Funcion que calcula el camino mas corto con la funcion de bfs mejorada
 (defun shortest-path-improved (end queue net)
   (bfs-improved end (list (list start)) net))
 
