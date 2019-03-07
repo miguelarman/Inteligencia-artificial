@@ -120,17 +120,18 @@
                                      nil))
    (T 'err)))
 
-
+;; Funcion que expande una expresion con formato correcto, y devuelve todas
+;; las hojas del arbol de verdad que representa a la expresion
 (defun expand-truth-tree-aux (expresion)
   (cond
    ((only-and-list expresion) '((nil nil)))
    
-  ;la expresion es +and+ y atomo, devuelve el atomo
+   ; la expresion es +and+ y atomo, devuelve el atomo
    ((and (positive-literal-p (first (rest expresion)))
          (null (rest (rest expresion))))
     (lista-de-atomo (first (rest expresion))))
      
-   ;la expresion es un +and+ con varios elementos
+   ; la expresion es un +and+ con varios elementos
    ((and (not (null (rest (rest expresion)))))
     (combinar-listas-and (expand-truth-tree-aux (cons +and+
                                                       (cons (first (rest expresion)) nil)))
@@ -146,6 +147,7 @@
     (expand-truth-tree-aux (first (rest expresion))))
    
    ; el elemento empieza por un +or+
+   
    ; Caso base (^ (V))
    ((and (eql +and+ (first expresion))
          (null (rest (rest expresion)))
@@ -156,26 +158,26 @@
    ((and (eql +and+ (first expresion))
          (null (rest (rest expresion)))
          (eql +or+ (first (first (rest expresion)))))
-    (combinar-listas-or (expand-truth-tree-aux (cons +and+
-                                              (cons
-                                               (first (rest
-                                                       (first (rest expresion)))) nil)))
-                        (expand-truth-tree-aux (cons +and+
-                                                     (cons
-                                                      (cons +or+
-                                                            (rest (rest
-                                                                   (first (rest expresion)))))
-                                                      nil)))))
-    
-    
-       
-   
+    (combinar-listas-or
+     (expand-truth-tree-aux (cons +and+
+                                  (cons
+                                   (first (rest
+                                           (first (rest expresion))))
+                                   nil)))
+     (expand-truth-tree-aux (cons +and+
+                                  (cons
+                                   (cons +or+
+                                         (rest (rest
+                                                (first (rest expresion)))))
+                                   nil)))))
    ; el elemento en un literal negado
    ((and (null (rest (rest expresion)))
          (negative-literal-p (first (rest expresion))))
     (lista-de-atomo (first (rest expresion))))
    
-   (T '(((A) (A)))))) ;; Explicar esto
+   ;; Si se llega a este caso, ha habido un error, por lo que
+   ;; devuelve un par no satisfacible
+   (T '(((A) (A))))))
 
 ;; Apartado 2
 
@@ -214,7 +216,7 @@
        (funcall funcion (first lista))
        (funcion-lista (rest lista) funcion)))))
         
- ;;Permite que todas las negaciones sean atomicas
+;;Permite que todas las negaciones sean atomicas
 (defun negar (expresion)
   (cond
    ((positive-literal-p expresion)
@@ -231,7 +233,7 @@
     (cons '!
           (cons expresion nil)))))
 
-;;Desarrolla los =>
+;; Desarrolla los =>
 (defun desarrollar-cond (expresion)
   (cons '^
         (cons (cons 'v
@@ -239,7 +241,7 @@
                           (cons (sintetizar-cond (first (rest (rest expresion)))) nil)))
               nil)))
 
-;;Desarrolla los <=>
+;; Desarrolla los <=>
 (defun desarrollar-bicond (expresion)
   (cons +and+ (cons
         (let ((a (sintetizar-bicond (first (rest expresion))))
@@ -251,7 +253,7 @@
                  (cons(cons +and+
                             (cons (negar a) (cons (negar b) nil)))nil)))) nil)))
 
-
+;; Explora la expresion y encuentra los bicondicionales a desarrollar
 (defun sintetizar-bicond (expresion)
   (cond
    ((or (positive-literal-p expresion) (negative-literal-p expresion)) expresion)
@@ -261,7 +263,7 @@
      (first expresion) 
      (funcion-lista (rest expresion) #'sintetizar-bicond)))))
 
-
+;; Explora la expresion y encuentra los condicionales a desarrollar
 (defun sintetizar-cond (expresion)
   (cond
    ((or (positive-literal-p expresion) (negative-literal-p expresion))
@@ -272,6 +274,8 @@
      (first expresion) 
      (funcion-lista (rest expresion) #'sintetizar-cond)))))
 
+;; Explora la expresion y encuentra las negaciones a desarrollar,
+;; y dejar como negaciones de átomos
 (defun sintetizar-negar (expresion)
   (cond
    ((or (positive-literal-p expresion) (negative-literal-p expresion))
@@ -281,7 +285,7 @@
             (funcion-lista (rest expresion) #'sintetizar-negar)))))
   
 
-;;Simplifica la expresión a and, or y negaciones atomicas
+;; Simplifica la expresion a and, or y negaciones atomicas
 (defun sintetizar (expresion)
   (cons +and+
         (cons (sintetizar-negar
