@@ -13,7 +13,7 @@
   '(
     (Paris Calais (50 20))
     (Paris Nevers (70 30))
-    ...
+    ;; ...
     ))
 
 (defparameter *train*
@@ -22,16 +22,16 @@
     (Calais Paris (34 60))
     (Paris Nevers (48 75))
     (Nevers Paris (48 75))
-    ...
+    ;; ...
     ))
 
 ;; Las estimaciones (heurística): Lista constante de pares formados por una ciudad y dos correspondientes
 ;; valores de las heurísticas (tiempo de recorrido y coste)
-(defparameter * estimate*
+(defparameter *estimate*
   '(
     (Calais (0 0))
     (Paris (30 0))
-    ...
+    ;; ...
     ))
 
 ;; Ciudad origen: El estado inicial será el correspondiente a estar en la ciudad donde empieza el viaje.
