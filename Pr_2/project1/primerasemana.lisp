@@ -6,6 +6,15 @@
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defun elimina-nil (lista)
+  (if (null lista)
+      NIL
+    (let
+        ((siguiente (elimina-nil (rest lista))))
+      (if (null (first lista))
+          siguiente
+        (cons (first lista) siguiente)))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 
 ;;    Problem definition
@@ -150,10 +159,11 @@
 ;;  the cost of travel
 
 (defun f-h-time (state sensors)
-  )
+  (first (first (rest (assoc state sensors)))))
 
 (defun f-h-price (state sensors)
-  )
+  (first (rest (first (rest (assoc state sensors))))))
+
 ;;
 ;; END: Exercise 1 -- Evaluation of the heuristic
 ;;
@@ -185,8 +195,23 @@
 ;;    A list of action structures with the origin in the current state and
 ;;    the destination in the states to which the current one is connected
 ;;
-(defun navigate (state lst-edges cfun  name &optional forbidden )
-  )
+(defun nav-aux (state edge cfun name forbidden)
+  (let
+      ((origin (first edge))
+       (dest (first (rest edge)))
+       (cost (first (rest (rest edge)))))
+    (when (and (eql state origin)
+               (null (member dest forbidden)))
+      (make-action :name name
+                   :origin origin
+                   :final dest
+                   :cost (funcall cfun cost)))))
+
+;; Funcion recursiva
+(defun navigate (state lst-edges cfun name &optional forbidden)
+  (elimina-nil (mapcar (lambda(edge) (nav-aux state edge cfun name forbidden)) lst-edges)))
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -197,10 +222,10 @@
 ;; from the current city to the cities reachable from it by canal navigation.
 ;;
 (defun navigate-canal-time (state canals)
-  )
+  (navigate state canals #'car 'navigate-canal-time))
 
 (defun navigate-canal-price (state canals)
-  )
+  (navigate state canals #'cadr 'navigate-canal-price))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -213,10 +238,10 @@
 ;; Note that this function takes as a parameter a list of forbidden cities.
 ;;
 (defun navigate-train-time (state trains forbidden)
-  )
+  (navigate state trains #'car 'navigate-train-time forbidden))
   
 (defun navigate-train-price (state trains forbidden)
-  )
+  (navigate state trains #'cadr 'navigate-train-price forbidden))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
