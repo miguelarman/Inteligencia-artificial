@@ -266,8 +266,36 @@
 ;;    NIL: invalid path: either the final city is not a destination or some
 ;;         of the mandatory cities are missing from the path.
 ;;
-(defun f-goal-test (node destination mandatory) 
-  )
+
+(defun contains-name-of (list-of-names node)
+  (cond
+   ((null list-of-names) NIL)
+   ((eql (first list-of-names) (node-state node)) T)
+   (T (contains-name-of (rest list-of-names) node))))
+                         
+(defun list-remove-elt (list elt)
+  (cond
+   ((null list) NIL)
+   ((eql elt (first list)) (list-remove-elt (rest list) elt))
+   (T (cons (first list)
+            (list-remove-elt (rest list) elt)))))
+
+
+(defun check-went-to-mandatories (node mandatory)
+  (cond
+   ((null node) NIL)
+   ((null mandatory) T)
+   ((contains-name-of mandatory node)
+    (check-went-to-mandatories node (list-remove-elt mandatory (node-state node))))
+   ((null (node-parent node)) NIL)
+   (T (check-went-to-mandatories (node-parent node) mandatory))))
+
+
+(defun f-goal-test (node destination mandatory)
+  (if (null (contains-name-of destination node))
+      NIL
+    (check-went-to-mandatories node mandatory)))
+   
 
 ;;
 ;; END: Exercise 3 -- Goal test
@@ -287,12 +315,12 @@
 ;; of the problem: two nodes are equivalent if they represent the same city 
 ;, and if the path they contain includes the same mandatory cities.
 ;;  Input:
-;;    node-1, node-1: the two nodes that we are comparing, each one
+;;    node-1, node-2: the two nodes that we are comparing, each one
 ;;                    defining a path through the parent links
 ;;    mandatory:  list with the names of the cities that is mandatory to visit
 ;;
 ;;  Returns
-;;    T: the two ndoes are equivalent
+;;    T: the two nodes are equivalent
 ;;    NIL: The nodes are not equivalent
 ;;
 (defun f-search-state-equal (node-1 node-2 &optional mandatory)
