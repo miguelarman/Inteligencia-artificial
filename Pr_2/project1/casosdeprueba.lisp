@@ -97,7 +97,7 @@
 ;;
 ;; NOTE: In order to run the tests from this point on, you must 
 ;; have solved exercise 5, that is, you must have created the 
-;; structures *travel-ceap* and *travel-fast*
+;; structures *travel-cheap* and *travel-fast*
 ;;
 ;; ALSO NOTE: The output of tehse examples is "as is", the same as
 ;; it appears on the allegro console. The console "cuts" some of 

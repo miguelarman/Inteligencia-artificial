@@ -313,7 +313,7 @@
 ;;
 ;; Determines if two nodes are equivalent with respect to the solution
 ;; of the problem: two nodes are equivalent if they represent the same city 
-;, and if the path they contain includes the same mandatory cities.
+;; and if the path they contain includes the same mandatory cities.
 ;;  Input:
 ;;    node-1, node-2: the two nodes that we are comparing, each one
 ;;                    defining a path through the parent links
@@ -323,8 +323,50 @@
 ;;    T: the two nodes are equivalent
 ;;    NIL: The nodes are not equivalent
 ;;
+  
+(defun has-visited (node mandatory-name)
+  ;(contains-name-of (nodes-to-names (get-visited-nodes node)) mandatory-name))
+  (cond
+   ((null node) NIL)
+   ((null (node-parent node)) NIL)
+   ((eql (node-state node) mandatory-name) T)
+   (T (has-visited (node-parent node) mandatory-name))))
+  
+
+; Esta funcion devuelve los nodos visitados en el orden
+; que estan en mandatory
+(defun get-visited-mandatories (node mandatory)
+  (cond
+   ((null mandatory) NIL)
+   ((has-visited node (first mandatory))
+    (cons (first mandatory)
+          (get-visited-mandatories node (rest mandatory))))
+   (T (get-visited-mandatories node (rest mandatory)))))
+  
+  
+  
+  
+
+; En esta funcion sabemos que las listas de nombres tienen el mismo orden
+; de elementos, por lo que solo comprobamos los primeros elementos de
+; cada lista
+(defun compare-list-of-names (list1 list2)
+  (cond
+   ((and (null list1) (null list2)) T)
+   ((null list2) NIL)
+   ((null list1) NIL)
+   ((eql (first list1) (first list2))
+    (compare-list-of-names (rest list1) (rest list2)))
+   (T NIL)))
+  
+  
 (defun f-search-state-equal (node-1 node-2 &optional mandatory)
-  )
+  (cond
+   ((not (eql (node-state node-1) (node-state node-2))) NIL)
+   ((null mandatory) T)
+   (T (compare-list-of-names
+       (get-visited-mandatories node-1 mandatory)
+       (get-visited-mandatories node-2 mandatory)))))
 
 ;;
 ;; END: Exercise 4 -- Equal predicate for search states
@@ -346,13 +388,42 @@
 ;;  There are two problems defined: one minimizes the travel time,
 ;;  the other minimizes the cost
 
-(defparameter *travel-cheap* 
-  (make-problem 
+(defparameter *travel-cheap*
+  (make-problem
+   :states *cities*
+   :initial-state *origin*
+   :f-h #'(lambda (state)
+            (f-h-cost state *estimate*))
+   :f-goal-test #'(lambda (node)
+                    (f-goal-test node *mandatory*))
+   :f-search-state-equal #'(lambda (node-1 node-2)
+                             (f-search-state-equal node-1 node-2 *mandatory*))
+   :operators (list
+               #'(lambda (node)
+                   ...)
+               #'(lambda (node)
+                   ...)
+               )
    )
   )
 
+
 (defparameter *travel-fast* 
-  (make-problem 
+  (make-problem
+   :states *cities*
+   :initial-state *origin*
+   :f-h #'(lambda (state)
+            (f-h-time state *estimate*))
+   :f-goal-test #'(lambda (node)
+                    (f-goal-test node *mandatory*))
+   :f-search-state-equal #'(lambda (node-1 node-2)
+                             (f-search-state-equal node-1 node-2 *mandatory*))
+   :operators (list
+               #'(lambda (node)
+                   ...)
+               #'(lambda (node)
+                   ...)
+               )
    )
   )
 
