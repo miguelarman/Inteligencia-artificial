@@ -391,10 +391,14 @@
 (defun operator-aux (edges cost-f node)
   (if (null edges)
       NIL
-    (if (eql (first (first edges)) (node-state node))
+    (let
+        ((edge (first edges))
+         (edge-state (first edge))
+         (edge-cost (first (rest edge))))
+      (if (eql edge-state (node-state node))
         (cons
-         (cons (first (first edges)) 
-               (cons (funcall cost-f (first (rest (first edges)))) NIL))
+         (cons edge-state 
+               (cons (funcall cost-f edge-cost) NIL))
          (operator-aux (rest edges) cost-f node))
       (operator-aux (rest edges) cost-f node))))
     
