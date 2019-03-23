@@ -548,7 +548,7 @@
 ;;;
 ;;;      nord --> '(11 5 9 16)
 ;;;
-;;;  the call (insert-nodes nord lst1 #'<) would produce
+;;;  the call (insert-nodes nord lst1 #'<)t would produce
 ;;;
 ;;;    (3 5 6 8 9 10 11 13 15 16)
 ;;;
