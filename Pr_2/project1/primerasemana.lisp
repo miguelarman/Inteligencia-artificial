@@ -560,6 +560,11 @@
 ;;;  receives a strategy, extracts from it the comparison function, 
 ;;;  and calls insert-nodes
 
+(defun insert-node-aux (node lst-nodes compare)
+  (cond ((null lst-nodes) (cons node nil))
+        ((funcall compare node (first lst-nodes))
+         (cons node lst-nodes))
+        (T (cons (first lst-nodes) (insert-node-aux node (rest lst-nodes) compare)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -579,8 +584,14 @@
 ;;    those of the list "nodes@. The list is ordered with respect to the 
 ;;   criterion node-compare-p.
 ;; 
+
+
+
 (defun insert-nodes (nodes lst-nodes node-compare-p)
-  )
+  (if (null nodes) 
+      lst-nodes
+        (let ((added-one (insert-node-aux (first nodes) lst-nodes node-compare-p)))
+          (insert-nodes (rest nodes) added-one node-compare-p))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -607,7 +618,8 @@
 ;;   use it to call insert-nodes.
 ;;
 (defun insert-nodes-strategy (nodes lst-nodes strategy)
-  )
+  (insert-nodes nodes lst-nodes (strategy-node-compare-p strategy)))
+  
 
 ;;
 ;;    END: Exercize 7 -- Node list management
