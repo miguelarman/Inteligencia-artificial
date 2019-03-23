@@ -401,17 +401,16 @@
            (cons edge-dest-state
                  (cons (funcall cost-f edge-cost) NIL))
            (operator-aux (rest edges) cost-f node))
-        (operator-aux (rest edges) cost-f node)))))
-    
+        (operator-aux (rest edges) cost-f node)))))    
 
 (defparameter *travel-cheap*
   (make-problem
    :states *cities*
    :initial-state *origin*
    :f-h #'(lambda (state)
-            (f-h-cost state *estimate*))
+            (f-h-price state *estimate*))
    :f-goal-test #'(lambda (node)
-                    (f-goal-test node *mandatory*))
+                    (f-goal-test node *destination* *mandatory*))
    :f-search-state-equal #'(lambda (node-1 node-2)
                              (f-search-state-equal node-1 node-2 *mandatory*))
    :operators (list
@@ -431,7 +430,7 @@
    :f-h #'(lambda (state)
             (f-h-time state *estimate*))
    :f-goal-test #'(lambda (node)
-                    (f-goal-test node *mandatory*))
+                    (f-goal-test node *destination* *mandatory*))
    :f-search-state-equal #'(lambda (node-1 node-2)
                              (f-search-state-equal node-1 node-2 *mandatory*))
    :operators (list
@@ -636,8 +635,15 @@
 ;; us which nodes should be analyzed first. In the A* strategy, the first 
 ;; node to be analyzed is the one with the smallest value of g+h
 ;;
+
+(defun node-f-<= (node-1 node-2)
+  (<= (node-f node-1)
+      (node-f node-2)))
+
 (defparameter *A-star*
-  (make-strategy ))
+  (make-strategy
+   :name 'A-star
+   :node-compare-p #'node-f-<=))
 
 ;;
 ;; END: Exercise 8 -- Definition of the A* strategy
@@ -699,9 +705,33 @@
 ;;     nested structure that contains not only the final node but the
 ;;     whole path from the starting node to the final.
 ;;
-(defun graph-search-aux (problem open-nodes closed-nodes strategy)
-  )
 
+(defun promising-node (node closed-nodes f-equal)
+  (cond
+   ((null closed-nodes) T)
+   ((and
+     (funcall f-equal node (first closed-nodes))
+     (> (node-g node)
+        (node-g (first (closed-nodes))))) NIL)
+   (T (promising-node node (rest closed-nodes) f-equal))))
+  
+
+(defun graph-search-aux (problem open-nodes closed-nodes strategy)
+  (cond
+   ((null open-nodes) NIL)
+   (T
+    (let
+        ((to-open (first open-nodes))
+         (not-opened (rest open-nodes)))
+      (if (funcall (problem-f-goal-test problem) to-open)
+          to-open
+        (if (promising-node to-open closed-nodes (problem-f-search-state-equal problem))
+            (let*
+                ((expanded (expand-node to-open problem))
+                 (new-opened (insert-nodes-strategy expanded not-opened strategy))
+                 (new-closed (cons to-open closed-nodes)))
+              (graph-search-aux problem new-opened new-closed strategy))
+          (graph-search-aux problem (rest open-nodes) closed-nodes strategy)))))))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;  Interface function for the graph search. 
@@ -724,13 +754,21 @@
 ;;    and an empty closed list.
 ;;
 (defun graph-search (problem strategy)
-  )
+  (graph-search-aux problem '(make-node
+                              :state NIL;(problem-initial-state problem)
+                              :parent NIL
+                              :action NIL
+                              :depth 0
+                              :g 0
+                              :h (funcall (problem-f-h problem) (problem-initial-state problem))
+                              :f (funcall (problem-f-h problem) (problem-initial-state problem))
+                              ) NIL strategy))
 
 ;
 ;  A* search is simply a function that solves a problem using the A* strategy
 ;
 (defun a-star-search (problem)
-  )
+  (graph-search problem *A-star*))
 
 
 ;;
