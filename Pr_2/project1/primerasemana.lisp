@@ -400,7 +400,7 @@
          (cons edge-state 
                (cons (funcall cost-f edge-cost) NIL))
          (operator-aux (rest edges) cost-f node))
-      (operator-aux (rest edges) cost-f node))))
+      (operator-aux (rest edges) cost-f node)))))
     
 
 (defparameter *travel-cheap*
