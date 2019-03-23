@@ -712,7 +712,7 @@
    ((and
      (funcall f-equal node (first closed-nodes))
      (> (node-g node)
-        (node-g (first (closed-nodes))))) NIL)
+        (node-g (first closed-nodes)))) NIL)
    (T (promising-node node (rest closed-nodes) f-equal))))
   
 
@@ -754,15 +754,15 @@
 ;;    and an empty closed list.
 ;;
 (defun graph-search (problem strategy)
-  (graph-search-aux problem '(make-node
-                              :state NIL;(problem-initial-state problem)
-                              :parent NIL
-                              :action NIL
-                              :depth 0
-                              :g 0
-                              :h (funcall (problem-f-h problem) (problem-initial-state problem))
-                              :f (funcall (problem-f-h problem) (problem-initial-state problem))
-                              ) NIL strategy))
+  (graph-search-aux problem (cons (make-node
+                                   :state (problem-initial-state problem)
+                                   :parent NIL
+                                   :action NIL
+                                   :depth 0
+                                   :g 0
+                                   :h (funcall (problem-f-h problem) (problem-initial-state problem))
+                                   :f (funcall (problem-f-h problem) (problem-initial-state problem)))
+                                  NIL) NIL strategy))
 
 ;
 ;  A* search is simply a function that solves a problem using the A* strategy
