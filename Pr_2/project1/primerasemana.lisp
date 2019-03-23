@@ -392,15 +392,16 @@
   (if (null edges)
       NIL
     (let
-        ((edge (first edges))
-         (edge-state (first edge))
+        ((edge (first edges)))
+      (let
+         ((edge-state (first edge))
          (edge-cost (first (rest edge))))
       (if (eql edge-state (node-state node))
         (cons
          (cons edge-state 
                (cons (funcall cost-f edge-cost) NIL))
          (operator-aux (rest edges) cost-f node))
-      (operator-aux (rest edges) cost-f node)))))
+      (operator-aux (rest edges) cost-f node))))))
     
 
 (defparameter *travel-cheap*
