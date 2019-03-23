@@ -484,7 +484,7 @@
 ;;    given one
 ;;
 
-(defun create-destination-nodes (node destinations name)
+(defun create-destination-nodes (node destinations name problem)
   (cond
    ((null destinations) NIL)
    (T
@@ -493,7 +493,7 @@
          (dest-state (first dest))
          (dest-cost (first (rest dest)))
          (g-value (+ (node-g node) dest-cost))
-         (h-value (funcall (problem-f-h dest-state) dest-state)))
+         (h-value (funcall (problem-f-h problem) dest-state)))
       (cons
        (make-node
         :state (first dest)
@@ -507,7 +507,7 @@
         :g g-value
         :h h-value
         :f (+ g-value h-value))
-       (create-destinations-nodes node (rest destinations) name))))))
+       (create-destination-nodes node (rest destinations) name problem))))))
        
    
 
@@ -516,14 +516,14 @@
       NIL
     (let
         ((destinations (funcall (first (problem-operators problem)) node)))
-      (create-destination-nodes node destinations 'navigate-train))))
+      (create-destination-nodes node destinations 'navigate-train problem))))
 
 (defun expand-node-canal (node problem)
   (if (null node)
       NIL
     (let
         ((destinations (funcall (first (rest (problem-operators problem))) node)))
-      (create-destination-nodes node destinations 'navigate-canal))))
+      (create-destination-nodes node destinations 'navigate-canal problem))))
     
 
 (defun expand-node (node problem)
