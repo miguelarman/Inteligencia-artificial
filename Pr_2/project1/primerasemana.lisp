@@ -493,7 +493,7 @@
          (dest-state (first dest))
          (dest-cost (first (rest dest)))
          (g-value (+ (node-g node) dest-cost))
-         (h-value (funcall (problem-f-h dest-state))))
+         (h-value (funcall (problem-f-h dest-state) dest-state)))
       (cons
        (make-node
         :state (first dest)
