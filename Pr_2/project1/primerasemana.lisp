@@ -292,9 +292,9 @@
 
 (defun node-is-destination (node destination)
   (cond
-   (((null destination) NIL)
-    ((eql (node-state node) (first destination)) T)
-    (T (node-is-destination (rest destination))))))
+   ((null destination) NIL)
+   ((eql (node-state node) (first destination)) T)
+   (T (node-is-destination node (rest destination)))))
 
 (defun f-goal-test (node destination mandatory)
   (if (null (contains-name-of destination node))
