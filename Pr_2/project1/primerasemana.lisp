@@ -488,25 +488,24 @@
   (cond
    ((null destinations) NIL)
    (T
-    (let
-        ((dest (first destinations)))
-      (let
-          ((dest-state (first dest))
-           (dest-cost (first (rest dest)))
-           (g-value (+ (node-g node) (first (rest dest))))
-           (h-value (funcall (problem-f-h (first dest)))))
-        (make-node
-         :state (first dest)
-         :parent node
-         :action (make-action
-                  :name name
-                  :origin (node-state node)
-                  :final dest-state
-                  :cost dest-cost)
-         :depth (+ (node-depth node) 1)
-         :g g-value
-         :h h-value
-         :f (+ g-value h-value)))))))
+    (let*
+        ((dest (first destinations))
+         (dest-state (first dest))
+         (dest-cost (first (rest dest)))
+         (g-value (+ (node-g node) (first (rest dest))))
+         (h-value (funcall (problem-f-h (first dest)))))
+      (make-node
+       :state (first dest)
+       :parent node
+       :action (make-action
+                :name name
+                :origin (node-state node)
+                :final dest-state
+                :cost dest-cost)
+       :depth (+ (node-depth node) 1)
+       :g g-value
+       :h h-value
+       :f (+ g-value h-value))))))
        
    
 
