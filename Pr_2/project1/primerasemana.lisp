@@ -388,6 +388,17 @@
 ;;  There are two problems defined: one minimizes the travel time,
 ;;  the other minimizes the cost
 
+(defun operator-aux (edges cost-f node)
+  (if (null edges)
+      NIL
+    (if (eql (first (first edges)) (node-state node))
+        (cons
+         (cons (first (first edges)) 
+               (cons (funcall cost-f (first (rest (first edges)))) NIL))
+         (operator-aux (rest edges) cost-f node))
+      (operator-aux (rest edges) cost-f node))))
+    
+
 (defparameter *travel-cheap*
   (make-problem
    :states *cities*
@@ -400,9 +411,9 @@
                              (f-search-state-equal node-1 node-2 *mandatory*))
    :operators (list
                #'(lambda (node)
-                   ...)
+                   (operator-aux *trains* 'cadr node))
                #'(lambda (node)
-                   ...)
+                   (operator-aux *canals* 'cadr node))
                )
    )
   )
@@ -420,9 +431,9 @@
                              (f-search-state-equal node-1 node-2 *mandatory*))
    :operators (list
                #'(lambda (node)
-                   ...)
+                   (operator-aux *trains* 'car node))
                #'(lambda (node)
-                   ...)
+                   (operator-aux *canals* 'car node))
                )
    )
   )
@@ -467,8 +478,51 @@
 ;;    A list (node_1,...,node_n) of nodes that can be reached from the
 ;;    given one
 ;;
+
+(defun create-destination-nodes (node destination name)
+  (cond
+   ((null destinations) NIL)
+   (T
+    (let
+        ((dest (first destinations))
+         (dest-state (first dest))
+         (dest-cost (first (rest dest)))
+         (g-value (+ (node-g node) (first (rest dest))))
+         (h-value (funcall (problem-f-h (first dest)))))
+      (make-node
+       :state (first dest)
+       :parent node
+       :action (make-action
+                :name name
+                :origin (node-state node)
+                :final dest-state
+                :cost dest-cost)
+       :depth (+ (node-depth node) 1)
+       :g g-value
+       :h h-value
+       :f (+ g-value h-value))))))
+       
+   
+
+(defun expand-node-train (node problem)
+  (if (null node)
+      NIL
+    (let
+        ((destinations (funcall (first (problem-operators problem)) node)))
+      (create-destination-nodes node destinations 'navigate-train))))
+
+(defun expand-node-canal (node problem)
+  (if (null node)
+      NIL
+    (let
+        ((destinations (funcall (first (rest (problem-operators problem))) node)))
+      (create-destination-nodes node destinations 'navigate-canal))))
+    
+
 (defun expand-node (node problem)
-  )
+  (append
+   (expand-node-train node problem)
+   (expand-node-canal node problem)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
