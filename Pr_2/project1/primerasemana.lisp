@@ -393,11 +393,12 @@
       NIL
     (let*
         ((edge (first edges))
-         (edge-state (first edge))
-         (edge-cost (first (rest edge))))
-      (if (eql edge-state (node-state node))
+         (edge-origin-state (first edge))
+         (edge-dest-state (first (rest edge)))
+         (edge-cost (first (rest (rest edge)))))
+      (if (eql edge-origin-state (node-state node))
           (cons
-           (cons edge-state
+           (cons edge-dest-state
                  (cons (funcall cost-f edge-cost) NIL))
            (operator-aux (rest edges) cost-f node))
         (operator-aux (rest edges) cost-f node)))))
@@ -483,7 +484,7 @@
 ;;    given one
 ;;
 
-(defun create-destination-nodes (node destination name)
+(defun create-destination-nodes (node destinations name)
   (cond
    ((null destinations) NIL)
    (T
