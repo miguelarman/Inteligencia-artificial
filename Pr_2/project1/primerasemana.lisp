@@ -448,7 +448,7 @@
                    (navigate-train-time (node-state node) *trains* *forbidden*))
                #'(lambda (node)
                    ;(operator-aux *canals* 'car node))
-                   (navigate-canal-time (node-state node) *trains*))
+                   (navigate-canal-time (node-state node) *canals*))
                )
    )
   )
