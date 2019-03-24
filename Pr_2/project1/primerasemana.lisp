@@ -395,20 +395,20 @@
 ;;  There are two problems defined: one minimizes the travel time,
 ;;  the other minimizes the cost
 
-(defun operator-aux (edges cost-f node)
-  (if (null edges)
-      NIL
-    (let*
-        ((edge (first edges))
-         (edge-origin-state (first edge))
-         (edge-dest-state (first (rest edge)))
-         (edge-cost (first (rest (rest edge)))))
-      (if (eql edge-origin-state (node-state node))
-          (cons
-           (cons edge-dest-state
-                 (cons (funcall cost-f edge-cost) NIL))
-           (operator-aux (rest edges) cost-f node))
-        (operator-aux (rest edges) cost-f node)))))    
+;(defun operator-aux (edges cost-f node)
+;  (if (null edges)
+;      NIL
+;    (let*
+;        ((edge (first edges))
+;         (edge-origin-state (first edge))
+;         (edge-dest-state (first (rest edge)))
+;         (edge-cost (first (rest (rest edge)))))
+;      (if (eql edge-origin-state (node-state node))
+;          (cons
+;           (cons edge-dest-state
+;                 (cons (funcall cost-f edge-cost) NIL))
+;           (operator-aux (rest edges) cost-f node))
+;        (operator-aux (rest edges) cost-f node)))))    
 
 (defparameter *travel-cheap*
   (make-problem
@@ -422,9 +422,11 @@
                              (f-search-state-equal node-1 node-2 *mandatory*))
    :operators (list
                #'(lambda (node)
-                   (operator-aux *trains* 'cadr node))
+                   ;(operator-aux *trains* 'cadr node))
+                   (navigate-train-price (node-state node) *trains* *forbidden*))
                #'(lambda (node)
-                   (operator-aux *canals* 'cadr node))
+                   ;(operator-aux *canals* 'cadr node))
+                   (navigate-canal-price (node-state node) *canals*))
                )
    )
   )
@@ -442,9 +444,11 @@
                              (f-search-state-equal node-1 node-2 *mandatory*))
    :operators (list
                #'(lambda (node)
-                   (operator-aux *trains* 'car node))
+                   ;(operator-aux *trains* 'car node))
+                   (navigate-train-time (node-state node) *trains* *forbidden*))
                #'(lambda (node)
-                   (operator-aux *canals* 'car node))
+                   ;(operator-aux *canals* 'car node))
+                   (navigate-canal-time (node-state node) *trains*))
                )
    )
   )
@@ -490,30 +494,24 @@
 ;;    given one
 ;;
 
-(defun create-destination-nodes (node destinations name problem)
+(defun create-destination-nodes (node actions problem)
   (cond
-   ((null destinations) NIL)
+   ((null actions) NIL)
    (T
     (let*
-        ((dest (first destinations))
-         (dest-state (first dest))
-         (dest-cost (first (rest dest)))
-         (g-value (+ (node-g node) dest-cost))
-         (h-value (funcall (problem-f-h problem) dest-state)))
+        ((action (first actions))
+         (g-value (node-g node))
+         (h-value (node-h node)))
       (cons
        (make-node
-        :state (first dest)
+        :state (action-final action)
         :parent node
-        :action (make-action
-                 :name name
-                 :origin (node-state node)
-                 :final dest-state
-                 :cost dest-cost)
+        :action action
         :depth (+ (node-depth node) 1)
         :g g-value
         :h h-value
         :f (+ g-value h-value))
-       (create-destination-nodes node (rest destinations) name problem))))))
+       (create-destination-nodes node (rest actions) problem))))))
        
    
 
@@ -521,16 +519,15 @@
   (if (null node)
       NIL
     (let
-        ((destinations (funcall (first (problem-operators problem)) node)))
-      (create-destination-nodes node destinations 'navigate-train problem))))
+        ((actions (funcall (first (problem-operators problem)) node)))
+      (create-destination-nodes node actions problem))))
 
 (defun expand-node-canal (node problem)
-  (if (null node)
+      (if (null node)
       NIL
     (let
-        ((destinations (funcall (first (rest (problem-operators problem))) node)))
-      (create-destination-nodes node destinations 'navigate-canal problem))))
-    
+        ((actions (funcall (first (rest (problem-operators problem))) node)))
+      (create-destination-nodes node actions problem))))
 
 (defun expand-node (node problem)
   (append
@@ -790,14 +787,24 @@
 ;;;
 ;*** solution-path ***
 
-(defun solution-path (node)
-  )
+(defun solution-path-aux (node)
+  (if (null node)
+      NIL
+    (cons (node-state node) (solution-path-aux (node-parent node)))))
 
+(defun solution-path (node)
+  (reverse (solution-path-aux node)))
+   
 ;*** action-sequence ***
 ; Visualize sequence of actions
 
+(defun action-sequence-aux (node)
+    (if (null node)
+      NIL
+    (cons (node-action node) (action-sequence-aux (node-parent node)))))
+  
 (defun action-sequence (node)
-  )
+  (reverse (action-sequence-aux node)))
 
 ;;; 
 ;;;    END Exercise 10: Solution path / action sequence
