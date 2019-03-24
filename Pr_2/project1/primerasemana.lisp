@@ -500,17 +500,18 @@
    (T
     (let*
         ((action (first actions))
-         (g-value (node-g node))
-         (h-value (node-h node)))
+         (new-state (action-final action))
+         (new-g-value (+ (node-g node) (action-cost action)))
+         (new-h-value (funcall (problem-f-h problem) new-state)))
       (cons
        (make-node
-        :state (action-final action)
+        :state new-state
         :parent node
         :action action
         :depth (+ (node-depth node) 1)
-        :g g-value
-        :h h-value
-        :f (+ g-value h-value))
+        :g new-g-value
+        :h new-h-value
+        :f (+ new-g-value new-h-value))
        (create-destination-nodes node (rest actions) problem))))))
        
    
