@@ -290,18 +290,11 @@
    ((null (node-parent node)) NIL)
    (T (check-went-to-mandatories (node-parent node) mandatory))))
 
-(defun node-is-destination (node destination)
-  (cond
-   ((null destination) NIL)
-   ((eql (node-state node) (first destination)) T)
-   (T (node-is-destination node (rest destination)))))
 
 (defun f-goal-test (node destination mandatory)
   (if (null (contains-name-of destination node))
       NIL
-    (and
-     (check-went-to-mandatories node mandatory)
-     (node-is-destination node destination))))
+    (check-went-to-mandatories node mandatory)))
    
 
 ;;
@@ -332,7 +325,6 @@
 ;;
   
 (defun has-visited (node mandatory-name)
-  ;(contains-name-of (nodes-to-names (get-visited-nodes node)) mandatory-name))
   (cond
    ((null node) NIL)
    ((null (node-parent node)) NIL)
