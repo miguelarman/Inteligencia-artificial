@@ -130,13 +130,27 @@
     (Limoges (100.0 0.0)) (Roenne (85.0 0.0)) (Lyon (105.0 0.0))
     (Toulouse (130.0 0.0)) (Avignon (135.0 0.0)) (Marseille (145.0 0.0))))
 
-(defparameter *origin* 'Marseille)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Parámetros del problema inicial
+;; 
+;; (defparameter *origin* 'Marseille)
+;; 
+;; (defparameter *destination* '(Calais))
+;; 
+;; (defparameter *forbidden*  '(Avignon))
+;; 
+;; (defparameter *mandatory* '(Paris))
 
+
+
+(defparameter *origin* 'Paris)
+ 
 (defparameter *destination* '(Calais))
-
-(defparameter *forbidden*  '(Avignon))
-
-(defparameter *mandatory* '(Paris))
+ 
+(defparameter *forbidden*  '())
+ 
+(defparameter *mandatory* '())
 
 
 ;; 
@@ -792,7 +806,8 @@
 ; Visualize sequence of actions
 
 (defun action-sequence-aux (node)
-    (if (null node)
+    (if (null (node-action node))
+;    (if (null node)
       NIL
     (cons (node-action node) (action-sequence-aux (node-parent node)))))
   
