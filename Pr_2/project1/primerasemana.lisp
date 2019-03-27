@@ -134,23 +134,13 @@
 ;;
 ;;  Parámetros del problema inicial
 ;; 
-;; (defparameter *origin* 'Marseille)
-;; 
-;; (defparameter *destination* '(Calais))
-;; 
-;; (defparameter *forbidden*  '(Avignon))
-;; 
-;; (defparameter *mandatory* '(Paris))
-
-
-
-(defparameter *origin* 'Paris)
+(defparameter *origin* 'Marseille)
  
 (defparameter *destination* '(Calais))
  
-(defparameter *forbidden*  '())
+(defparameter *forbidden*  '(Avignon))
  
-(defparameter *mandatory* '())
+(defparameter *mandatory* '(Paris))
 
 
 ;; 
@@ -428,10 +418,8 @@
                              (f-search-state-equal node-1 node-2 *mandatory*))
    :operators (list
                #'(lambda (node)
-                   ;(operator-aux *trains* 'cadr node))
                    (navigate-train-price (node-state node) *trains* *forbidden*))
                #'(lambda (node)
-                   ;(operator-aux *canals* 'cadr node))
                    (navigate-canal-price (node-state node) *canals*))
                )
    )

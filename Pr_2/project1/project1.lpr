@@ -5,7 +5,8 @@
 (define-project :name :project1
   :modules (list (make-instance 'module :name "primerasemana.lisp")
                  (make-instance 'module :name "notas")
-                 (make-instance 'module :name "casosdeprueba.lisp"))
+                 (make-instance 'module :name "casosdeprueba.lisp")
+                 (make-instance 'module :name "ej12.lisp"))
   :projects nil
   :libraries nil
   :editable-files nil
