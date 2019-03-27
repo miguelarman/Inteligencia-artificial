@@ -807,7 +807,6 @@
 
 (defun action-sequence-aux (node)
     (if (null (node-action node))
-;    (if (null node)
       NIL
     (cons (node-action node) (action-sequence-aux (node-parent node)))))
   
