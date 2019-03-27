@@ -803,3 +803,43 @@
 ;;;    END Exercise 10: Solution path / action sequence
 ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; 
+;;;    BEGIN Exercise 11: Other strategies
+;;;
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; 
+;;;    Búsqueda en profundidad
+;;; 
+(defun depth-first-node-compare-p (node-1 node-2)
+  (>= (node-depth node-1)
+      (node-depth node-2)))
+
+(defparameter *depth-first*
+  (make-strategy
+   :name 'depth-first
+   :node-compare-p #'depth-first-node-compare-p))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; 
+;;;    Búsqueda en anchura
+;;; 
+(defun breadth-first-node-compare-p (node-1 node-2)
+  (<= (node-depth node-1)
+      (node-depth node-2)))
+
+
+(defparameter *breadth-first*
+  (make-strategy
+   :name 'breadth-first
+   :node-compare-p #'breadth-first-node-compare-p))
+
+;;; 
+;;;    END Exercise 11: Other strategies
+;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
