@@ -253,6 +253,34 @@
 ;;
 
 
+;; Función auxiliar que comprueba si un nombre (de un nodo)
+;; se encuentra en una lista de nombres
+(defun contains-name-of (list-of-names node)
+  (cond
+   ((null list-of-names) NIL)
+   ((eql (first list-of-names) (node-state node)) T)
+   (T (contains-name-of (rest list-of-names) node))))
+
+;; Función auxiliar que, de una lista, elimina un cierto elemento
+(defun list-remove-elt (list elt)
+  (cond
+   ((null list) NIL)
+   ((eql elt (first list)) (list-remove-elt (rest list) elt))
+   (T (cons (first list)
+            (list-remove-elt (rest list) elt)))))
+
+;; Función auxiliar que comprueba si un nodo ha
+;; pasado por una lista de nodos aleatorios (haciendo
+;; uso del campo action de la estructura de nodo)
+(defun check-went-to-mandatories (node mandatory)
+  (cond
+   ((null node) NIL)
+   ((null mandatory) T)
+   ((contains-name-of mandatory node)
+    (check-went-to-mandatories node (list-remove-elt mandatory (node-state node))))
+   ((null (node-parent node)) NIL)
+   (T (check-went-to-mandatories (node-parent node) mandatory))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;; Goal test
@@ -270,31 +298,6 @@
 ;;    NIL: invalid path: either the final city is not a destination or some
 ;;         of the mandatory cities are missing from the path.
 ;;
-
-(defun contains-name-of (list-of-names node)
-  (cond
-   ((null list-of-names) NIL)
-   ((eql (first list-of-names) (node-state node)) T)
-   (T (contains-name-of (rest list-of-names) node))))
-                         
-(defun list-remove-elt (list elt)
-  (cond
-   ((null list) NIL)
-   ((eql elt (first list)) (list-remove-elt (rest list) elt))
-   (T (cons (first list)
-            (list-remove-elt (rest list) elt)))))
-
-
-(defun check-went-to-mandatories (node mandatory)
-  (cond
-   ((null node) NIL)
-   ((null mandatory) T)
-   ((contains-name-of mandatory node)
-    (check-went-to-mandatories node (list-remove-elt mandatory (node-state node))))
-   ((null (node-parent node)) NIL)
-   (T (check-went-to-mandatories (node-parent node) mandatory))))
-
-
 (defun f-goal-test (node destination mandatory)
   (if (null (contains-name-of destination node))
       NIL
@@ -313,21 +316,7 @@
 ;;
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
-;; Determines if two nodes are equivalent with respect to the solution
-;; of the problem: two nodes are equivalent if they represent the same city 
-;; and if the path they contain includes the same mandatory cities.
-;;  Input:
-;;    node-1, node-2: the two nodes that we are comparing, each one
-;;                    defining a path through the parent links
-;;    mandatory:  list with the names of the cities that is mandatory to visit
-;;
-;;  Returns
-;;    T: the two nodes are equivalent
-;;    NIL: The nodes are not equivalent
-;;
-  
+;; Función que comprueba si un nodo ha pasado anteriormente por otro
 (defun has-visited (node mandatory-name)
   (cond
    ((null node) NIL)
@@ -346,9 +335,6 @@
           (get-visited-mandatories node (rest mandatory))))
    (T (get-visited-mandatories node (rest mandatory)))))
   
-  
-  
-  
 
 ; En esta funcion sabemos que las listas de nombres tienen el mismo orden
 ; de elementos, por lo que solo comprobamos los primeros elementos de
@@ -361,8 +347,21 @@
    ((eql (first list1) (first list2))
     (compare-list-of-names (rest list1) (rest list2)))
    (T NIL)))
-  
-  
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Determines if two nodes are equivalent with respect to the solution
+;; of the problem: two nodes are equivalent if they represent the same city 
+;; and if the path they contain includes the same mandatory cities.
+;;  Input:
+;;    node-1, node-2: the two nodes that we are comparing, each one
+;;                    defining a path through the parent links
+;;    mandatory:  list with the names of the cities that is mandatory to visit
+;;
+;;  Returns
+;;    T: the two nodes are equivalent
+;;    NIL: The nodes are not equivalent
+;;
 (defun f-search-state-equal (node-1 node-2 &optional mandatory)
   (cond
    ((not (eql (node-state node-1) (node-state node-2))) NIL)
@@ -389,22 +388,7 @@
 ;;  the second parameter of the navigate operators. 
 ;;
 ;;  There are two problems defined: one minimizes the travel time,
-;;  the other minimizes the cost
-
-;(defun operator-aux (edges cost-f node)
-;  (if (null edges)
-;      NIL
-;    (let*
-;        ((edge (first edges))
-;         (edge-origin-state (first edge))
-;         (edge-dest-state (first (rest edge)))
-;         (edge-cost (first (rest (rest edge)))))
-;      (if (eql edge-origin-state (node-state node))
-;          (cons
-;           (cons edge-dest-state
-;                 (cons (funcall cost-f edge-cost) NIL))
-;           (operator-aux (rest edges) cost-f node))
-;        (operator-aux (rest edges) cost-f node)))))    
+;;  the other minimizes the cost    
 
 (defparameter *travel-cheap*
   (make-problem
@@ -474,20 +458,10 @@
 ;; using that action.
 ;;
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; 
-;;  Creates a list with all the nodes that can be reached from the
-;;  current one using all the operators in a given problem
-;;
-;;  Input:
-;;    node:   the node structure from which we start.
-;;    problem: the problem structure with the list of operators
-;;
-;;  Returns:
-;;    A list (node_1,...,node_n) of nodes that can be reached from the
-;;    given one
-;;
 
+;; Función auxiliar que se encarga, sobre un nodo concreto y acciones
+;; posibles, a devolver todos los nodos a los que puede ir. Esto
+;; se llama "expandir un nodo"
 (defun create-destination-nodes (node actions problem)
   (cond
    ((null actions) NIL)
@@ -509,7 +483,7 @@
        (create-destination-nodes node (rest actions) problem))))))
        
    
-
+;; Funciones auxiliares que se encargan de expandir un nodo
 (defun expand-node-train (node problem)
   (if (null node)
       NIL
@@ -524,6 +498,19 @@
         ((actions (funcall (first (rest (problem-operators problem))) node)))
       (create-destination-nodes node actions problem))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; 
+;;  Creates a list with all the nodes that can be reached from the
+;;  current one using all the operators in a given problem
+;;
+;;  Input:
+;;    node:   the node structure from which we start.
+;;    problem: the problem structure with the list of operators
+;;
+;;  Returns:
+;;    A list (node_1,...,node_n) of nodes that can be reached from the
+;;    given one
+;;
 (defun expand-node (node problem)
   (append
    (expand-node-train node problem)
@@ -558,6 +545,8 @@
 ;;;  receives a strategy, extracts from it the comparison function, 
 ;;;  and calls insert-nodes
 
+;; Función auxiliar que se encarga de insertar un
+;; solo nodo en una lista ordenada
 (defun insert-node-aux (node lst-nodes compare)
   (cond ((null lst-nodes) (cons node nil))
         ((funcall compare node (first lst-nodes))
@@ -582,9 +571,6 @@
 ;;    those of the list "nodes@. The list is ordered with respect to the 
 ;;   criterion node-compare-p.
 ;; 
-
-
-
 (defun insert-nodes (nodes lst-nodes node-compare-p)
   (if (null nodes) 
       lst-nodes
@@ -678,6 +664,17 @@
 ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; Función que comprueba si un nodo es prometedor, es decir,
+;; tiene menor coste que todos los demás de ese mismo estado
+(defun promising-node (node closed-nodes f-equal)
+  (cond
+   ((null closed-nodes) T)
+   ((and
+     (funcall f-equal node (first closed-nodes))
+     (> (node-g node)
+        (node-g (first closed-nodes)))) NIL)
+   (T (promising-node node (rest closed-nodes) f-equal))))
+  
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -704,17 +701,6 @@
 ;;     nested structure that contains not only the final node but the
 ;;     whole path from the starting node to the final.
 ;;
-
-(defun promising-node (node closed-nodes f-equal)
-  (cond
-   ((null closed-nodes) T)
-   ((and
-     (funcall f-equal node (first closed-nodes))
-     (> (node-g node)
-        (node-g (first closed-nodes)))) NIL)
-   (T (promising-node node (rest closed-nodes) f-equal))))
-  
-
 (defun graph-search-aux (problem open-nodes closed-nodes strategy)
   (cond
    ((null open-nodes) NIL)
@@ -731,6 +717,7 @@
                  (new-closed (cons to-open closed-nodes)))
               (graph-search-aux problem new-opened new-closed strategy))
           (graph-search-aux problem (rest open-nodes) closed-nodes strategy)))))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;  Interface function for the graph search. 
@@ -780,7 +767,9 @@
 ;;; 
 ;;;    BEGIN Exercise 10: Solution path
 ;;;
+
 ;*** solution-path ***
+; Returns path of the solution
 
 (defun solution-path-aux (node)
   (if (null node)
