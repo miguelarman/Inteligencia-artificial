@@ -1,14 +1,16 @@
-Ejercicio 2
+Ejercicio 2:
 
 igual(X,X).
-invierte([],[]).
-invierte([H|T], L) :- invierte(T, R), concatena(R, [H], L).
 
+concatena([],L,L).
+concatena([X|L],L1,[X|L2]) :- concatena(L,L1,L2).
 
-Ejercicio 3
-palindromo(X) :- invierte(X,Y), igual(X,Y).
+invierte([],[]) :- !.
+invierte([F|R],L) :- concatena(I, [F], L), invierte(R, I).
 
-Ejercicio 4
-igual(X,X).
+Ejercicio 3:
+palindromo(X) :- invierte(Y, X), igual(X,Y).
+
+Ejercicio 4:
 divide(L,0,L1,L2) :- igual(L1,[]), igual(L,L2).
 divide([A|L],N,[B|L1],L2) :- igual(A,B),N>0,succ(New, N),divide(L,New,L1,L2).
