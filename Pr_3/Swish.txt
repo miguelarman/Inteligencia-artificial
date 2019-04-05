@@ -23,9 +23,17 @@ aplasta([X|L], R) :- aplasta([X], LX), aplasta(L, LL), concatena(LX, LL, R).
 % Ejercicio 6
 primos(2, [2]) :- !.
 primos(1, []) :- !.
-primos(N, [D|L]) :- prime_factor(D,N), concatena([D], U, L), primos(N/D, U).
+% primos(N, [D|L]) :- prime_factor(D,N), concatena([D], U, L), primos(N/D, U).
 
-next_factor(N,2,NF) :- next_factor(N,3,NF).
+divide(N, D) :- 0 is mod(N, D), N>0, D>0.
+
+es_primo(N, 1) :- N>0, !.
+es_primo(N, Num) :-
+    N>0, Num>0, not(divide(N, Num)), New is Num-1, es_primo(N, New).
+primo(N) :- N>0, es_primo(N, N-1).
+
+next_factor(N,F,NF) :- primo(F), divide(F, N), next_factor(N/F, F, NF).
+
 
 
 
