@@ -19,3 +19,41 @@ aplasta([], []) :- !.
 aplasta([X], [X]) :- not(is_list(X)), !.
 aplasta([X], Y) :- is_list(X), aplasta(X,Y), !.
 aplasta([X|L], R) :- aplasta([X], LX), aplasta(L, LL), concatena(LX, LL, R).
+
+% Ejercicio 6
+primos(2, [2]) :- !.
+primos(1, []) :- !.
+primos(N, [D|L]) :- prime_factor(D,N), concatena([D], U, L), primos(N/D, U).
+
+next_factor(N,2,NF) :- next_factor(N,3,NF).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+% Sacado de internet. No usar
+
+prime_factor(N, D) :-
+    find_prime_factor(N, 2, D).
+
+find_prime_factor(N, D, D) :-
+    0 is N mod D.
+find_prime_factor(N, D, R) :-
+    D < N,
+    (0 is N mod D
+    -> (N1 is N/D, find_prime_factor(N1, D, R))
+    ;  (D1 is D + 1, find_prime_factor(N, D1, R))
+    ).
