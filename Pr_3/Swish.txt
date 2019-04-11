@@ -59,6 +59,73 @@ next_factor(N, 2, NF) :- next_factor(N, 3, NF).
 % factor a mirar es F+2.
 next_factor(N, F, NF) :- N>=F, New is F+2, next_factor(N, New, NF).
 
+% Ejercicio 7
+
+% Apartado 1
+
+% Caso base cuando la lista es vacía
+cod_primero(X, [], [], [X]).
+
+% Caso base cuando la lista tiene solo el elemento en cuestón
+cod_primero(X, [X], [], [X,X]).
+
+% Caso base, cuando la lista empieza por un elemento diferente
+cod_primero(X, [Y | Lrem], [Y | Lrem], [X]) :-
+    not(igual(X, Y)).
+
+% Función general, recursiva. De una lista, calcula la lista de
+% todos los elementos iniciales iguales a un elemento en cuestión
+cod_primero(X, [X | RestoLista], Lrem, [X | Lfront]) :-
+    cod_primero(X, RestoLista, Lrem, Lfront).
+
+
+% Apartado 2
+
+% Caso base de la función cuando la lista es vacía
+cod_all([], []).
+
+% Función general que de una lista de elementos,
+% forma listas de cada elemento
+% Por ejemplo, de la lista
+% [1, 2, 2, 3, 4, 4]
+% devuelve la lista
+% [[1], [2, 2], [3], [4, 4]]
+cod_all([X | Rest], [Lfront | Lsiguiente]) :-
+    cod_primero(X, Rest, Lrest, Lfront),
+    cod_all(Lrest, Lsiguiente).
+    
+    
+% Apartado 3
+
+% Función interfaz del ejercicio.
+% De una lista de elementos, forma primero sus ternas correspondientes
+% con cod_all, y después genera la lista de pares correspondientes
+run_length(L, Ret) :-
+    cod_all(L, Ternas),
+    cuenta_ternas(Ternas, Ret),
+    !.
+    
+% Funión auxiliar que de una lista de ternas
+% [[a, a, ..., a], ..., [z, z, ..., z]]
+% devuelve la lista formada por sus pares
+% [[na a], ..., [nz, z]]
+% donde cada par representa el número de veces que aparece el elemento
+% y el elemento
+cuenta_ternas([T], [L]) :- cuenta_terna(T, L).
+cuenta_ternas([Terna|RTernas], [Par|RPares]) :-
+    cuenta_terna(Terna, Par),
+    cuenta_ternas(RTernas, RPares).
+
+% Función auxiliar que de una terna:
+% [a, a, ..., a]
+% devuelve el par correspondiente:
+% [n, a]
+% donde a es el elemento y n el número de veces que aparece
+cuenta_terna([X], [1, X]).
+cuenta_terna([X | L], [Nnew, X]) :-
+    cuenta_terna(L, [N,_]),
+    Nnew is N+1.
+
 % Ejercicio 8
 
 % Devuelve la dupla de mayor peso
