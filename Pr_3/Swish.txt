@@ -126,7 +126,9 @@ cuenta_terna([X | L], [Nnew, X]) :-
     cuenta_terna(L, [N,_]),
     Nnew is N+1.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Ejercicio 8
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Devuelve la dupla de mayor peso
 % Caso base: si hay un elemento, el elemento de mayor peso es el
@@ -177,3 +179,30 @@ encode_list([L1|[]], [L2], Tree):- encode_elem(L1,L2,Tree).
 encode_list([L|R],L2,Tree):- 
     encode_elem(L,NewE,Tree), encode_list(R,NewL,Tree), 
     concatena([NewE],NewL,L2). 
+
+%%8.3
+dictionary([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,
+             t,u,v,w,x,y,z]).
+
+in_dict(A) :- dictionary(D), member(A,D).
+
+reordenar(E,P,[],New) :- igual(New, [E-P]).
+reordenar(E,P,[E1-P1|LL],New) :- P > P1, 
+    concatena([E-P], [E1-P1|LL], New).
+reordenar(E,P,[E1-P1|LL],New) :- reordenar(E,P,LL,NL),
+    concatena([E1-P1],NL,New).
+
+insert_elem([],Elem,New) :- igual(New,[Elem-1]).
+insert_elem([E-P|L],Elem,New) :- not(igual(E,Elem)), 
+    insert_elem(L,Elem,NewL), igual(New,[E-P|NewL]).
+insert_elem([E-P|L],Elem,New) :- igual(E,Elem),
+    NewP is P+1, reordenar(E,NewP,L,New).
+
+build_list_rec([],L,NewL) :- igual(L,NewL).
+build_list_rec([E|Elems],L,NewL) :- in_dict(E),
+    insert_elem(L,E,Added), build_list_rec(Elems,Added,NewL).
+build_list(Frase, L) :- build_list_rec(Frase,[],L), !.
+
+encode(L1,L2, Tree) :- build_list(L1, List), build_tree(List, Tree),
+    encode_list(L1, L2, Tree).
+
