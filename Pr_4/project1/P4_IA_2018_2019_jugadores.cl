@@ -89,7 +89,63 @@
 
 (defvar *jugador-humano* (make-jugador :nombre 'Jugador-humano
 				       :f-jugador #'f-jugador-humano
-				       :f-eval  #'f-no-eval))
+                                       :f-eval  #'f-no-eval))
+
+; -------------------------------------------------------
+
+(defun finales-posibles-vertical-casilla (estado jugador columna fila)
+  (let*
+      ((tablero (estado-tablero tablero))
+       (cuenta (contar-abajo tablero ficha columna fila)))
+    (cond
+     ((and (> cuenta 0) (< cuenta 4)) 0)
+     (T
+      0))))
+
+(defun finales-posibles-vertical-recursiva (estado jugador columna fila)
+  (let*
+      ((tablero (estado-tablero tablero)))
+    (if (not (dentro-del-tablero-p tablero columna fila))
+        0
+      (if (not (dentro-del-tablero tablero (+ 1 columna) nfila))
+          (+
+           (finales-posibles-vertical-recursiva tablero (+ 1 columna) 0)
+           (finales-posibles-vertical-casilla estado jugador columna fila))
+        (+
+         (finales-posibles-vertical-recursiva tablero columna (+ 1 fila))
+         (finales-posibles-vertical-casilla estado jugador columna fila))))))
+        
+            
+(defun finales-posibles-vertical (estado jugador)
+  (finales-posibles-vertical-recursiva (estado jugador 0 0)))
+
+(defun finales-posibles-horizontal (estado jugador) 0)
+
+(defun finales-posibles-oblicuo-derecha (estado jugador) 0)
+
+(defun finales-posibles-oblicuo-derecha (estado jugador) 0)
+
+(defun finales-posibles (estado jugador)
+  (+
+   (finales-posibles-vertical (estado jugador))
+   (finales-posibles-horizontal (estado jugador))
+   (finales-posibles-oblicuo-derecha (estado jugador))
+   (finales-posibles-oblicuo-derecha (estado jugador)))
+
+(defun diferencia-finales (estado)
+  (let
+      ((jugador (estado-turno estado)))
+    (-
+     (finales-posibles estado jugador)
+     (finales-posibles estado (siguiente-jugador jugador)))))
+
+
+
+(defvar *otro-jugador* (make-jugador :nombre 'Otro-jugador
+                                     :f-jugador #'f-jugador-negamax
+                                     :f-eval  #'diferencia-finales))
+; --------------------------------------------------------
+
 
 ;; -------------------------------------------------------------------------------
 ;; Algunas partidas de ejemplo:
@@ -103,7 +159,9 @@
 ;(print (partida *jugador-bueno* *jugador-bueno* 4))
 ;(print (partida *jugador-humano* *jugador-humano*))
 ;(print (partida *jugador-humano* *jugador-aleatorio* 4))
-(print (partida *jugador-humano* *jugador-bueno* 4))
+;(print (partida *jugador-humano* *jugador-bueno* 4))
 ;(print (partida *jugador-aleatorio* *jugador-humano*))
+
+(print (partida *jugador-aleatorio* *otro-jugador* 4))
 
 ;;

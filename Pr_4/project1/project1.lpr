@@ -3,8 +3,8 @@
 (in-package :cg-user)
 
 (define-project :name :project1
-  :modules (list (make-instance 'module :name "P4_IA_2018_2019_conecta4.v0")
-                 (make-instance 'module :name "P4_IA_2018_2019_jugadores.v0"))
+  :modules (list (make-instance 'module :name "P4_IA_2018_2019_conecta4")
+                 (make-instance 'module :name "P4_IA_2018_2019_jugadores"))
   :projects nil
   :libraries nil
   :editable-files nil
