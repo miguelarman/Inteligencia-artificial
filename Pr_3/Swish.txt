@@ -21,47 +21,188 @@ aplasta([X], Y) :- is_list(X), aplasta(X,Y), !.
 aplasta([X|L], R) :- aplasta([X], LX), aplasta(L, LL), concatena(LX, LL, R).
 
 % Ejercicio 6
-primos(2, [2]) :- !.
+% Caso base
 primos(1, []) :- !.
-% primos(N, [D|L]) :- prime_factor(D,N), concatena([D], U, L), primos(N/D, U).
+% Se llama a la funcion recursiva pri_apartir
+primos(N, L) :- N>1, pri_apartir(N,2,L), !.
 
-divide(N, D) :- 0 is mod(N, D), N>0, D>0.
+% pri_apartir calcula los factores primos de N a partir de I
+% Caso base: solo queda un factor, por lo que N y I son iguales
+pri_apartir(N,I,[Last]) :- 
+    next_factor(N,I,Next), New is N/Next, igual(New,1), igual(Last,Next), !.
+% Caso general: la lista de factores es el primer factor mas los factores
+% que dan lugar de la division de N/Next
+pri_apartir(N,I,[Next|L]) :- 
+    next_factor(N,I,Next), New is N/Next, pri_apartir(New,Next,L), !.
 
+% Permite saber si un numero divide a otro
+divide(D, N) :- N>0, D>0, 0 is mod(N, D).
+
+% Funcion recursiva que mira si todos los numeros por debajo de N
+% son coprimos con él
+% Caso base: si se ha llegado a 1, se devuelve True
 es_primo(N, 1) :- N>0, !.
+% Caso general: se mira si no divide a cierto número, y recursivamente
+% si no divide a todos los inferiores
 es_primo(N, Num) :-
-    N>0, Num>0, not(divide(N, Num)), New is Num-1, es_primo(N, New).
+    N>0, Num>0, not(divide(Num, N)), New is Num-1, es_primo(N, New).
+% Calcula si un numero es primo
 primo(N) :- N>0, es_primo(N, N-1).
 
-next_factor(N,F,NF) :- primo(F), divide(F, N), next_factor(N/F, F, NF).
+% Calcula el siguiente factor (el mismo si esta repetido) de un numero
+% N, donde F es el factor inicial y NF el siguiente
+% Caso base: si F divide al numero, F es el siguiente factor
+next_factor(N, F, NF) :- divide(F, N), igual(F,NF), !.
+% Si F es 2, el siguiente factor a comprobar es 3
+next_factor(N, 2, NF) :- next_factor(N, 3, NF).
+% Si F es cualquier otro factor que se este comprobando, el siguiente
+% factor a mirar es F+2.
+next_factor(N, F, NF) :- N>=F, New is F+2, next_factor(N, New, NF).
+
+% Ejercicio 7
+
+% Apartado 1
+
+% Caso base cuando la lista es vacía
+cod_primero(X, [], [], [X]).
+
+% Caso base cuando la lista tiene solo el elemento en cuestón
+cod_primero(X, [X], [], [X,X]).
+
+% Caso base, cuando la lista empieza por un elemento diferente
+cod_primero(X, [Y | Lrem], [Y | Lrem], [X]) :-
+    not(igual(X, Y)).
+
+% Función general, recursiva. De una lista, calcula la lista de
+% todos los elementos iniciales iguales a un elemento en cuestión
+cod_primero(X, [X | RestoLista], Lrem, [X | Lfront]) :-
+    cod_primero(X, RestoLista, Lrem, Lfront).
 
 
+% Apartado 2
+
+% Caso base de la función cuando la lista es vacía
+cod_all([], []).
+
+% Función general que de una lista de elementos,
+% forma listas de cada elemento
+% Por ejemplo, de la lista
+% [1, 2, 2, 3, 4, 4]
+% devuelve la lista
+% [[1], [2, 2], [3], [4, 4]]
+cod_all([X | Rest], [Lfront | Lsiguiente]) :-
+    cod_primero(X, Rest, Lrest, Lfront),
+    cod_all(Lrest, Lsiguiente).
+    
+    
+% Apartado 3
+
+% Función interfaz del ejercicio.
+% De una lista de elementos, forma primero sus ternas correspondientes
+% con cod_all, y después genera la lista de pares correspondientes
+run_length(L, Ret) :-
+    cod_all(L, Ternas),
+    cuenta_ternas(Ternas, Ret),
+    !.
+    
+% Funión auxiliar que de una lista de ternas
+% [[a, a, ..., a], ..., [z, z, ..., z]]
+% devuelve la lista formada por sus pares
+% [[na a], ..., [nz, z]]
+% donde cada par representa el número de veces que aparece el elemento
+% y el elemento
+cuenta_ternas([T], [L]) :- cuenta_terna(T, L).
+cuenta_ternas([Terna|RTernas], [Par|RPares]) :-
+    cuenta_terna(Terna, Par),
+    cuenta_ternas(RTernas, RPares).
+
+% Función auxiliar que de una terna:
+% [a, a, ..., a]
+% devuelve el par correspondiente:
+% [n, a]
+% donde a es el elemento y n el número de veces que aparece
+cuenta_terna([X], [1, X]).
+cuenta_terna([X | L], [Nnew, X]) :-
+    cuenta_terna(L, [N,_]),
+    Nnew is N+1.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Ejercicio 8
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Devuelve la dupla de mayor peso
+% Caso base: si hay un elemento, el elemento de mayor peso es el
+% unico posible
+mayor_peso(L-P,[L-P|[]]).
+% Caso general 1: si el primer elemento es mayor que el mayor elemento
+% del resto, el primer elemento es el mayor de la lista
+mayor_peso(L-P,[L-P|LL]) :- mayor_peso(_-New, LL), P>=New.
+% Caso general 2: si el primer elemento no es mayor, conservamos
+% el mayor elemento
+mayor_peso(NNew-New,[_-P|LL]) :- mayor_peso(NNew-New, LL), P<New.
+
+% Elimina una dupla de la lista conociendo el primer elemento
+% Caso base: se elimina el primer elemento, que es el que queriamos
+elimina_elem(E, [E-_|L], L).
+% Caso general: se concatena el primer elemento con el resto de la
+% lista, que contiene el elemento eliminado.
+elimina_elem(E, [L-P|LL], [L-P|New]) :- elimina_elem(E, LL, New).
 
 
+% Caso base: si hay un elemento, las dos hojas son  nil
+build_tree([ER-_|[]], Tree) :- igual(Tree,tree(ER, nil, nil)).
+% Caso general: el primer elemento conforma la rama izquierda y el
+% resto la derecha
+build_tree([ER-PR|L],Tree) :- 
+	build_tree(L, NewR), build_tree([ER-PR],NewL), 
+    igual(Tree, tree(1,NewL,NewR)).
 
+% Funciones auxiliares para encontrar la info o una hoja del arbol
+info(tree(I,_,_),I).
+left(tree(_,L,_),L).
+right(tree(_,_,R),R).
 
+% Casos base: una de las hojas contiene el nodo que buscabamos
+encode_elem(X1,X2,Tree):- 
+    left(Tree, L), info(L, IL), igual(IL,X1), igual(X2,[0]).
+encode_elem(X1,X2,Tree):-
+    right(Tree, R), info(R, IR), igual(IR,X1), igual(X2,[1]).
+% Caso general: se añade un 1 a la codificacion y se concatena con
+% el resultado que de la busqueda en la hoja derecha
+encode_elem(X1,X2,Tree):-
+    right(Tree,RTree),encode_elem(X1,New,RTree),concatena([1],New,X2).
 
+% Caso base: solo hay un elemento que codificar
+encode_list([L1|[]], [L2], Tree):- encode_elem(L1,L2,Tree).
+% Caso general: se codifica el primer elemento y se concatena 
+% recursivamente con el resto
+encode_list([L|R],L2,Tree):- 
+    encode_elem(L,NewE,Tree), encode_list(R,NewL,Tree), 
+    concatena([NewE],NewL,L2). 
 
+%%8.3
+dictionary([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,
+             t,u,v,w,x,y,z]).
 
+in_dict(A) :- dictionary(D), member(A,D).
 
+reordenar(E,P,[],New) :- igual(New, [E-P]).
+reordenar(E,P,[E1-P1|LL],New) :- P > P1, 
+    concatena([E-P], [E1-P1|LL], New).
+reordenar(E,P,[E1-P1|LL],New) :- reordenar(E,P,LL,NL),
+    concatena([E1-P1],NL,New).
 
+insert_elem([],Elem,New) :- igual(New,[Elem-1]).
+insert_elem([E-P|L],Elem,New) :- not(igual(E,Elem)), 
+    insert_elem(L,Elem,NewL), igual(New,[E-P|NewL]).
+insert_elem([E-P|L],Elem,New) :- igual(E,Elem),
+    NewP is P+1, reordenar(E,NewP,L,New).
 
+build_list_rec([],L,NewL) :- igual(L,NewL).
+build_list_rec([E|Elems],L,NewL) :- in_dict(E),
+    insert_elem(L,E,Added), build_list_rec(Elems,Added,NewL).
+build_list(Frase, L) :- build_list_rec(Frase,[],L), !.
 
+encode(L1,L2, Tree) :- build_list(L1, List), build_tree(List, Tree),
+    encode_list(L1, L2, Tree).
 
-
-
-
-
-
-% Sacado de internet. No usar
-
-prime_factor(N, D) :-
-    find_prime_factor(N, 2, D).
-
-find_prime_factor(N, D, D) :-
-    0 is N mod D.
-find_prime_factor(N, D, R) :-
-    D < N,
-    (0 is N mod D
-    -> (N1 is N/D, find_prime_factor(N1, D, R))
-    ;  (D1 is D + 1, find_prime_factor(N, D1, R))
-    ).
