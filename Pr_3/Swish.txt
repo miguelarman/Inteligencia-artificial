@@ -28,21 +28,21 @@ primos(N, L) :- N>1, pri_apartir(N,2,L), !.
 
 % pri_apartir calcula los factores primos de N a partir de I
 % Caso base: solo queda un factor, por lo que N y I son iguales
-pri_apartir(N,I,[Last]) :- 
+pri_apartir(N,I,[Last]) :-
     next_factor(N,I,Next), New is N/Next, igual(New,1), igual(Last,Next), !.
 % Caso general: la lista de factores es el primer factor mas los factores
 % que dan lugar de la division de N/Next
-pri_apartir(N,I,[Next|L]) :- 
+pri_apartir(N,I,[Next|L]) :-
     next_factor(N,I,Next), New is N/Next, pri_apartir(New,Next,L), !.
 
 % Permite saber si un numero divide a otro
 divide(D, N) :- N>0, D>0, 0 is mod(N, D).
 
 % Funcion recursiva que mira si todos los numeros por debajo de N
-% son coprimos con él
+% son coprimos con ï¿½l
 % Caso base: si se ha llegado a 1, se devuelve True
 es_primo(N, 1) :- N>0, !.
-% Caso general: se mira si no divide a cierto número, y recursivamente
+% Caso general: se mira si no divide a cierto nï¿½mero, y recursivamente
 % si no divide a todos los inferiores
 es_primo(N, Num) :-
     N>0, Num>0, not(divide(Num, N)), New is Num-1, es_primo(N, New).
@@ -63,28 +63,28 @@ next_factor(N, F, NF) :- N>=F, New is F+2, next_factor(N, New, NF).
 
 % Apartado 1
 
-% Caso base cuando la lista es vacía
+% Caso base cuando la lista es vacï¿½a
 cod_primero(X, [], [], [X]).
 
-% Caso base cuando la lista tiene solo el elemento en cuestón
+% Caso base cuando la lista tiene solo el elemento en cuestï¿½n
 cod_primero(X, [X], [], [X,X]).
 
 % Caso base, cuando la lista empieza por un elemento diferente
 cod_primero(X, [Y | Lrem], [Y | Lrem], [X]) :-
     not(igual(X, Y)).
 
-% Función general, recursiva. De una lista, calcula la lista de
-% todos los elementos iniciales iguales a un elemento en cuestión
+% Funciï¿½n general, recursiva. De una lista, calcula la lista de
+% todos los elementos iniciales iguales a un elemento en cuestiï¿½n
 cod_primero(X, [X | RestoLista], Lrem, [X | Lfront]) :-
     cod_primero(X, RestoLista, Lrem, Lfront).
 
 
 % Apartado 2
 
-% Caso base de la función cuando la lista es vacía
+% Caso base de la funciï¿½n cuando la lista es vacï¿½a
 cod_all([], []).
 
-% Función general que de una lista de elementos,
+% Funciï¿½n general que de una lista de elementos,
 % forma listas de cada elemento
 % Por ejemplo, de la lista
 % [1, 2, 2, 3, 4, 4]
@@ -93,34 +93,34 @@ cod_all([], []).
 cod_all([X | Rest], [Lfront | Lsiguiente]) :-
     cod_primero(X, Rest, Lrest, Lfront),
     cod_all(Lrest, Lsiguiente).
-    
-    
+
+
 % Apartado 3
 
-% Función interfaz del ejercicio.
+% Funciï¿½n interfaz del ejercicio.
 % De una lista de elementos, forma primero sus ternas correspondientes
-% con cod_all, y después genera la lista de pares correspondientes
+% con cod_all, y despuï¿½s genera la lista de pares correspondientes
 run_length(L, Ret) :-
     cod_all(L, Ternas),
     cuenta_ternas(Ternas, Ret),
     !.
-    
-% Funión auxiliar que de una lista de ternas
+
+% Funiï¿½n auxiliar que de una lista de ternas
 % [[a, a, ..., a], ..., [z, z, ..., z]]
 % devuelve la lista formada por sus pares
 % [[na a], ..., [nz, z]]
-% donde cada par representa el número de veces que aparece el elemento
+% donde cada par representa el nï¿½mero de veces que aparece el elemento
 % y el elemento
 cuenta_ternas([T], [L]) :- cuenta_terna(T, L).
 cuenta_ternas([Terna|RTernas], [Par|RPares]) :-
     cuenta_terna(Terna, Par),
     cuenta_ternas(RTernas, RPares).
 
-% Función auxiliar que de una terna:
+% Funciï¿½n auxiliar que de una terna:
 % [a, a, ..., a]
 % devuelve el par correspondiente:
 % [n, a]
-% donde a es el elemento y n el número de veces que aparece
+% donde a es el elemento y n el nï¿½mero de veces que aparece
 cuenta_terna([X], [1, X]).
 cuenta_terna([X | L], [Nnew, X]) :-
     cuenta_terna(L, [N,_]),
@@ -153,8 +153,8 @@ elimina_elem(E, [L-P|LL], [L-P|New]) :- elimina_elem(E, LL, New).
 build_tree([ER-_|[]], Tree) :- igual(Tree,tree(ER, nil, nil)).
 % Caso general: el primer elemento conforma la rama izquierda y el
 % resto la derecha
-build_tree([ER-PR|L],Tree) :- 
-	build_tree(L, NewR), build_tree([ER-PR],NewL), 
+build_tree([ER-PR|L],Tree) :-
+	build_tree(L, NewR), build_tree([ER-PR],NewL),
     igual(Tree, tree(1,NewL,NewR)).
 
 % Funciones auxiliares para encontrar la info o una hoja del arbol
@@ -163,22 +163,22 @@ left(tree(_,L,_),L).
 right(tree(_,_,R),R).
 
 % Casos base: una de las hojas contiene el nodo que buscabamos
-encode_elem(X1,X2,Tree):- 
+encode_elem(X1,X2,Tree):-
     left(Tree, L), info(L, IL), igual(IL,X1), igual(X2,[0]).
 encode_elem(X1,X2,Tree):-
     right(Tree, R), info(R, IR), igual(IR,X1), igual(X2,[1]).
-% Caso general: se añade un 1 a la codificacion y se concatena con
+% Caso general: se aï¿½ade un 1 a la codificacion y se concatena con
 % el resultado que de la busqueda en la hoja derecha
 encode_elem(X1,X2,Tree):-
     right(Tree,RTree),encode_elem(X1,New,RTree),concatena([1],New,X2).
 
 % Caso base: solo hay un elemento que codificar
 encode_list([L1|[]], [L2], Tree):- encode_elem(L1,L2,Tree).
-% Caso general: se codifica el primer elemento y se concatena 
+% Caso general: se codifica el primer elemento y se concatena
 % recursivamente con el resto
-encode_list([L|R],L2,Tree):- 
-    encode_elem(L,NewE,Tree), encode_list(R,NewL,Tree), 
-    concatena([NewE],NewL,L2). 
+encode_list([L|R],L2,Tree):-
+    encode_elem(L,NewE,Tree), encode_list(R,NewL,Tree),
+    concatena([NewE],NewL,L2).
 
 %%8.3
 dictionary([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,
@@ -186,23 +186,32 @@ dictionary([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,
 
 in_dict(A) :- dictionary(D), member(A,D).
 
-reordenar(E,P,[],New) :- igual(New, [E-P]).
-reordenar(E,P,[E1-P1|LL],New) :- P > P1, 
-    concatena([E-P], [E1-P1|LL], New).
-reordenar(E,P,[E1-P1|LL],New) :- reordenar(E,P,LL,NL),
-    concatena([E1-P1],NL,New).
 
-insert_elem([],Elem,New) :- igual(New,[Elem-1]).
-insert_elem([E-P|L],Elem,New) :- not(igual(E,Elem)), 
+pivote(_, [], [], []).
+pivote(Piv, [F|L], [F|Menor], Mayor) :-
+    igual(F, _-P), Piv =< P, pivote(Piv, L, Menor, Mayor).
+pivote(Piv, [F|L], Menor, [F|Mayor]) :- pivote(Piv, L, Menor, Mayor).
+
+quicksort([], []).
+quicksort([F|L], Ordenado) :- igual(F, _-P), pivote(P, L, L1, L2),
+    quicksort(L1, Orden1), quicksort(L2, Orden2),
+    concatena(Orden1, [F|Orden2], Ordenado), !.
+
+insert_elem([E-P|L],Elem,New) :- not(igual(E,Elem)),
     insert_elem(L,Elem,NewL), igual(New,[E-P|NewL]).
 insert_elem([E-P|L],Elem,New) :- igual(E,Elem),
-    NewP is P+1, reordenar(E,NewP,L,New).
+    NewP is P+1, igual(New,[E-NewP|L]).
+
+%Construye una lista a partir del diccionario con todas las letras
+%a peso 0
+build_list_dict([],[]).
+build_list_dict([E|D],[E-0|L]) :- build_list_dict(D,L).
 
 build_list_rec([],L,NewL) :- igual(L,NewL).
 build_list_rec([E|Elems],L,NewL) :- in_dict(E),
     insert_elem(L,E,Added), build_list_rec(Elems,Added,NewL).
-build_list(Frase, L) :- build_list_rec(Frase,[],L), !.
+build_list(Frase, Order) :- dictionary(D),build_list_dict(D,Init),
+    build_list_rec(Frase,Init,L), quicksort(L,Order), !.
 
-encode(L1,L2, Tree) :- build_list(L1, List), build_tree(List, Tree),
+encode(L1,L2) :- build_list(L1, List), build_tree(List, Tree),
     encode_list(L1, L2, Tree).
-
