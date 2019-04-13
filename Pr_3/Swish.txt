@@ -1,4 +1,7 @@
-igual(X,X).
+﻿igual(X,X).
+% Ejercicio 1
+duplica([],[]).
+duplica([E|L],[E|[E|L1]]) :- duplica(L,L1).
 
 % Ejercicio 2
 concatena([],L,L).
@@ -21,43 +24,11 @@ aplasta([X], Y) :- is_list(X), aplasta(X,Y), !.
 aplasta([X|L], R) :- aplasta([X], LX), aplasta(L, LL), concatena(LX, LL, R).
 
 % Ejercicio 6
-% Caso base
-primos(1, []) :- !.
-% Se llama a la funcion recursiva pri_apartir
-primos(N, L) :- N>1, pri_apartir(N,2,L), !.
-
-% pri_apartir calcula los factores primos de N a partir de I
-% Caso base: solo queda un factor, por lo que N y I son iguales
-pri_apartir(N,I,[Last]) :-
-    next_factor(N,I,Next), New is N/Next, igual(New,1), igual(Last,Next), !.
-% Caso general: la lista de factores es el primer factor mas los factores
-% que dan lugar de la division de N/Next
-pri_apartir(N,I,[Next|L]) :-
-    next_factor(N,I,Next), New is N/Next, pri_apartir(New,Next,L), !.
-
-% Permite saber si un numero divide a otro
-divide(D, N) :- N>0, D>0, 0 is mod(N, D).
-
-% Funcion recursiva que mira si todos los numeros por debajo de N
-% son coprimos con �l
-% Caso base: si se ha llegado a 1, se devuelve True
-es_primo(N, 1) :- N>0, !.
-% Caso general: se mira si no divide a cierto n�mero, y recursivamente
-% si no divide a todos los inferiores
-es_primo(N, Num) :-
-    N>0, Num>0, not(divide(Num, N)), New is Num-1, es_primo(N, New).
-% Calcula si un numero es primo
-primo(N) :- N>0, es_primo(N, N-1).
-
-% Calcula el siguiente factor (el mismo si esta repetido) de un numero
-% N, donde F es el factor inicial y NF el siguiente
-% Caso base: si F divide al numero, F es el siguiente factor
-next_factor(N, F, NF) :- divide(F, N), igual(F,NF), !.
-% Si F es 2, el siguiente factor a comprobar es 3
-next_factor(N, 2, NF) :- next_factor(N, 3, NF).
-% Si F es cualquier otro factor que se este comprobando, el siguiente
-% factor a mirar es F+2.
-next_factor(N, F, NF) :- N>=F, New is F+2, next_factor(N, New, NF).
+primos_rec(1,[],_).
+primos_rec(N,[Pr|F],Pr) :- 0 is mod(N,Pr), New is N/Pr, 
+    	primos_rec(New,F,Pr).
+primos_rec(N,F,Pr) :- NewP is Pr+1, primos_rec(N,F,NewP).
+primos(N,L) :- N>0, primos_rec(N,L,2), !.
 
 % Ejercicio 7
 
