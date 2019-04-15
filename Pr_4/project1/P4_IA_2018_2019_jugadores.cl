@@ -95,42 +95,91 @@
 
 (defun finales-posibles-vertical-casilla (estado jugador columna fila)
   (let*
-      ((tablero (estado-tablero tablero))
-       (cuenta (contar-abajo tablero ficha columna fila)))
-    (cond
-     ((and (> cuenta 0) (< cuenta 4)) 0)
-     (T
-      0))))
-
-(defun finales-posibles-vertical-recursiva (estado jugador columna fila)
-  (let*
-      ((tablero (estado-tablero tablero)))
+      ((tablero (estado-tablero estado)))
     (if (not (dentro-del-tablero-p tablero columna fila))
         0
-      (if (not (dentro-del-tablero tablero (+ 1 columna) nfila))
-          (+
-           (finales-posibles-vertical-recursiva tablero (+ 1 columna) 0)
-           (finales-posibles-vertical-casilla estado jugador columna fila))
-        (+
-         (finales-posibles-vertical-recursiva tablero columna (+ 1 fila))
-         (finales-posibles-vertical-casilla estado jugador columna fila))))))
-        
-            
-(defun finales-posibles-vertical (estado jugador)
-  (finales-posibles-vertical-recursiva (estado jugador 0 0)))
+      (let*
+          ((cuenta (contar-abajo tablero jugador columna fila)))
+        (cond
+         ((and (> cuenta 0) (< cuenta 4)) 0)          ; Casilla propia pero no hay suficientes conectadas
+         ((null (obtener-ficha tablero columna fila)) ; Casilla libre
+          (+ 1 (finales-posibles-vertical-casilla
+                estado jugador
+                columna (+ 1 fila))))
+         (T                                           ; Casilla enemiga
+          0))))))
 
-(defun finales-posibles-horizontal (estado jugador) 0)
+(defun finales-posibles-horizontal-casilla (estado jugador columna fila)
+  (let*
+      ((tablero (estado-tablero estado)))
+    (if (not (dentro-del-tablero-p tablero columna fila))
+        0
+      (let*
+          ((cuenta (contar-derecha tablero jugador columna fila)))
+        (cond
+         ((and (> cuenta 0) (< cuenta 4)) 0)          ; Casilla propia pero no hay suficientes conectadas
+         ((null (obtener-ficha tablero columna fila)) ; Casilla libre
+          (+ 1 (finales-posibles-horizontal-casilla
+                estado jugador
+                (+ 1 columna) fila)))
+         (T                                           ; Casilla enemiga
+          0))))))
 
-(defun finales-posibles-oblicuo-derecha (estado jugador) 0)
+(defun finales-posibles-oblicuo-derecha-casilla (estado jugador columna fila)
+  (let*
+      ((tablero (estado-tablero estado)))
+    (if (not (dentro-del-tablero-p tablero columna fila))
+        0
+      (let*
+          ((cuenta (contar-abajo-derecha tablero jugador columna fila)))
+        (cond
+         ((and (> cuenta 0) (< cuenta 4)) 0)          ; Casilla propia pero no hay suficientes conectadas
+         ((null (obtener-ficha tablero columna fila)) ; Casilla libre
+          (+ 1 (finales-posibles-oblicuo-derecha-casilla
+                estado jugador
+                (+ 1 columna) (+ 1 fila))))
+         (T                                           ; Casilla enemiga
+          0))))))
 
-(defun finales-posibles-oblicuo-derecha (estado jugador) 0)
+(defun finales-posibles-oblicuo-izquierda-casilla (estado jugador columna fila)
+  (let*
+      ((tablero (estado-tablero estado)))
+    (if (not (dentro-del-tablero-p tablero columna fila))
+        0
+      (let*
+          ((cuenta (contar-abajo-izquierda tablero jugador columna fila)))
+        (cond
+         ((and (> cuenta 0) (< cuenta 4)) 0)          ; Casilla propia pero no hay suficientes conectadas
+         ((null (obtener-ficha tablero columna fila)) ; Casilla libre
+          (+ 1 (finales-posibles-oblicuo-izquierda-casilla
+                estado jugador
+                (- columna 1) (+ 1 fila))))
+         (T                                           ; Casilla enemiga
+          0))))))
 
-(defun finales-posibles (estado jugador)
+
+(defun finales-posibles-casilla (estado jugador columna fila)
   (+
-   (finales-posibles-vertical (estado jugador))
-   (finales-posibles-horizontal (estado jugador))
-   (finales-posibles-oblicuo-derecha (estado jugador))
-   (finales-posibles-oblicuo-derecha (estado jugador)))
+   (finales-posibles-vertical-casilla estado jugador columna fila)
+   (finales-posibles-horizontal-casilla estado jugador columna fila)
+   (finales-posibles-oblicuo-derecha-casilla estado jugador columna fila)
+   (finales-posibles-oblicuo-izquierda-casilla estado jugador columna fila)))
+
+(defun finales-posibles-recursiva (estado jugador columna fila)
+  (let*
+      ((tablero (estado-tablero estado)))
+    (if (not (dentro-del-tablero-p tablero columna fila))
+        0
+      (if (not (dentro-del-tablero-p tablero (+ 1 columna) fila))
+          (+
+           (finales-posibles-recursiva estado jugador 0 (+ 1 fila))
+           (finales-posibles-casilla estado jugador columna fila))
+        (+
+         (finales-posibles-recursiva estado jugador (+ 1 columna) fila)
+         (finales-posibles-casilla estado jugador columna fila))))))
+        
+(defun finales-posibles (estado jugador)
+  (finales-posibles-recursiva estado jugador 0 0))
 
 (defun diferencia-finales (estado)
   (let
@@ -151,7 +200,8 @@
 ;; Algunas partidas de ejemplo:
 ;; -------------------------------------------------------------------------------
 
-(setf *verbose* t)
+(setf *verbose* nil)
+;(setf *verbose* t)
 
 ;(print (partida *jugador-aleatorio* *jugador-aleatorio*))
 ;(print (partida *jugador-aleatorio* *jugador-bueno* 4))
@@ -162,6 +212,23 @@
 ;(print (partida *jugador-humano* *jugador-bueno* 4))
 ;(print (partida *jugador-aleatorio* *jugador-humano*))
 
-(print (partida *jugador-aleatorio* *otro-jugador* 4))
+;(print (partida *jugador-aleatorio* *otro-jugador* 4))
 
-;;
+(defun prueba (n enemigo)
+  (setq val1 0)
+  (dotimes (x n)
+    (setq val1 (+ val1 (partida enemigo *otro-jugador* 4))))
+  (setq val2 0)
+  (dotimes (x n)
+    (setq val2 (+ val2 (partida *otro-jugador* enemigo 4))))
+  (print val1)
+  (print (- n val2))
+  (print (/ (+ val1 (- n val2)) (* 2 n))))
+
+
+(print 'a)
+(prueba 20 *jugador-aleatorio*)
+(print 'b)
+(prueba 20 *jugador-bueno*)
+(print 'c)
+(prueba 20 *otro-jugador*)
