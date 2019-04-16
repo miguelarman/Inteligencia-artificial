@@ -1,37 +1,50 @@
 ﻿igual(X,X).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Ejercicio 1
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 duplica([],[]).
 duplica([E|L],[E|[E|L1]]) :- duplica(L,L1).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Ejercicio 2
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5
 concatena([],L,L).
 concatena([X|L],L1,[X|L2]) :- concatena(L,L1,L2).
 
 invierte([],[]) :- !.
 invierte([F|R],L) :- concatena(I, [F], L), invierte(R, I).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Ejercicio 3
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 palindromo(X) :- invierte(Y, X), igual(X,Y).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Ejercicio 4
-divide(L,0,L1,L2) :- igual(L1,[]), igual(L,L2).
-divide([A|L],N,[B|L1],L2) :- igual(A,B),N>0,succ(New, N),divide(L,New,L1,L2).
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+divide(L,0,[],L).
+divide([A|L],N,[A|L1],L2) :- N>0,succ(New, N),divide(L,New,L1,L2).
 
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Ejercicio 5
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 aplasta([], []) :- !.
 aplasta([X], [X]) :- not(is_list(X)), !.
 aplasta([X], Y) :- is_list(X), aplasta(X,Y), !.
 aplasta([X|L], R) :- aplasta([X], LX), aplasta(L, LL), concatena(LX, LL, R).
 
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Ejercicio 6
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 primos_rec(1,[],_).
-primos_rec(N,[Pr|F],Pr) :- 0 is mod(N,Pr), New is N/Pr, 
-    	primos_rec(New,F,Pr).
+primos_rec(N,[Pr|F],Pr) :- 0 is mod(N,Pr), New is N/Pr,
+	primos_rec(New,F,Pr).
 primos_rec(N,F,Pr) :- NewP is Pr+1, primos_rec(N,F,NewP).
 primos(N,L) :- N>0, primos_rec(N,L,2), !.
 
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Ejercicio 7
-
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Apartado 1
 
 % Caso base cuando la lista es vac�a
@@ -99,35 +112,17 @@ cuenta_terna([X | L], [Nnew, X]) :-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Ejercicio 8
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Devuelve la dupla de mayor peso
-% Caso base: si hay un elemento, el elemento de mayor peso es el
-% unico posible
-mayor_peso(L-P,[L-P|[]]).
-% Caso general 1: si el primer elemento es mayor que el mayor elemento
-% del resto, el primer elemento es el mayor de la lista
-mayor_peso(L-P,[L-P|LL]) :- mayor_peso(_-New, LL), P>=New.
-% Caso general 2: si el primer elemento no es mayor, conservamos
-% el mayor elemento
-mayor_peso(NNew-New,[_-P|LL]) :- mayor_peso(NNew-New, LL), P<New.
-
-% Elimina una dupla de la lista conociendo el primer elemento
-% Caso base: se elimina el primer elemento, que es el que queriamos
-elimina_elem(E, [E-_|L], L).
-% Caso general: se concatena el primer elemento con el resto de la
-% lista, que contiene el elemento eliminado.
-elimina_elem(E, [L-P|LL], [L-P|New]) :- elimina_elem(E, LL, New).
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Caso base: si hay un elemento, las dos hojas son  nil
-build_tree([ER-_|[]], Tree) :- igual(Tree,tree(ER, nil, nil)).
+build_tree([ER-_], Tree) :- igual(Tree,tree(ER, nil, nil)).
 % Caso general: el primer elemento conforma la rama izquierda y el
 % resto la derecha
 build_tree([ER-PR|L],Tree) :-
 	build_tree(L, NewR), build_tree([ER-PR],NewL),
     igual(Tree, tree(1,NewL,NewR)).
 
+%%%%%%%%%%%%%%%%%%8.1%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Funciones auxiliares para encontrar la info o una hoja del arbol
 info(tree(I,_,_),I).
 left(tree(_,L,_),L).
@@ -143,15 +138,19 @@ encode_elem(X1,X2,Tree):-
 encode_elem(X1,X2,Tree):-
     right(Tree,RTree),encode_elem(X1,New,RTree),concatena([1],New,X2).
 
-% Caso base: solo hay un elemento que codificar
-encode_list([L1|[]], [L2], Tree):- encode_elem(L1,L2,Tree).
+% Caso especial: si la lista contiene un elemento
+encode_elem(X1,[],Tree):- info(Tree, X1).
+
+%%%%%%%%%%%%%%%%%%8.2%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Caso base: no hay elementos que codificar
+encode_list([], [], _).
 % Caso general: se codifica el primer elemento y se concatena
 % recursivamente con el resto
 encode_list([L|R],L2,Tree):-
     encode_elem(L,NewE,Tree), encode_list(R,NewL,Tree),
     concatena([NewE],NewL,L2).
 
-%%8.3
+%%%%%%%%%%%%%%%%%%8.3%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 dictionary([a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,
              t,u,v,w,x,y,z]).
 
