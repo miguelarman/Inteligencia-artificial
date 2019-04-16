@@ -184,15 +184,30 @@
 (defun diferencia-finales (estado)
   (let
       ((jugador (estado-turno estado)))
-    (-
-     (finales-posibles estado jugador)
-     (finales-posibles estado (siguiente-jugador jugador)))))
+    (cond
+     ((ganador estado) +val-max+)
+     ((tablas-p estado) 0)                 ; Ajustar este valor
+     (T
+      (-
+       (finales-posibles estado jugador)
+       (finales-posibles estado (siguiente-jugador jugador)))))))
 
 
 
-(defvar *otro-jugador* (make-jugador :nombre 'Otro-jugador
+(defvar *jugador-optimista* (make-jugador :nombre 'Optimista
                                      :f-jugador #'f-jugador-negamax
                                      :f-eval  #'diferencia-finales))
+; --------------------------------------------------------
+; Aleatoria pero escoge los finales inmediatos
+(defun f-aleatoria-mejorada (estado)
+  (cond
+   ((ganador estado) +val-max+)
+   ((tablas-p estado) 0)                 ; Ajustar este valor
+   (T (random 100))))
+
+(defvar *jugador-aleatorio-mejorado* (make-jugador :nombre 'Aleatorio-mejorado
+                                     :f-jugador #'f-jugador-negamax
+                                     :f-eval  #'f-aleatoria-mejorada))
 ; --------------------------------------------------------
 
 
@@ -212,23 +227,43 @@
 ;(print (partida *jugador-humano* *jugador-bueno* 4))
 ;(print (partida *jugador-aleatorio* *jugador-humano*))
 
-;(print (partida *jugador-aleatorio* *otro-jugador* 4))
+;(print (partida *jugador-aleatorio* *jugador-optimista* 4))
 
-(defun prueba (n enemigo)
+(defun prueba (n jugador enemigo)
   (setq val1 0)
-  (dotimes (x n)
-    (setq val1 (+ val1 (partida enemigo *otro-jugador* 4))))
   (setq val2 0)
   (dotimes (x n)
-    (setq val2 (+ val2 (partida *otro-jugador* enemigo 4))))
+    (setq val1 (+ val1
+                  (let
+                      ((puntuacion (partida enemigo jugador 4)))
+                    (if (null puntuacion)
+                        0
+                      puntuacion)))))
+  (dotimes (x n)
+    (setq val2 (+ val2 (let
+                      ((puntuacion (partida jugador enemigo 4)))
+                    (if (null puntuacion)
+                        0
+                      puntuacion)))))
   (print val1)
   (print (- n val2))
   (print (/ (+ val1 (- n val2)) (* 2 n))))
 
 
-(print 'a)
-(prueba 20 *jugador-aleatorio*)
-(print 'b)
-(prueba 20 *jugador-bueno*)
-(print 'c)
-(prueba 20 *otro-jugador*)
+(print 'aleatorio_contra_optimista)
+;(prueba 100 *jugador-optimista* *jugador-aleatorio*)
+
+(print 'bueno_contra_optimista)
+;(prueba 10 *jugador-optimista* *jugador-bueno*)
+
+(print 'optimista_contra_optimista)
+;(prueba 10 *jugador-optimista* *jugador-optimista*)
+
+(print 'aleatorio_contra_aleatorio_mejorado)
+;(prueba 100 *jugador-aleatorio-mejorado* *jugador-aleatorio*)
+
+(print 'bueno_contra_aleatorio_mejorado)
+;(prueba 100 *jugador-aleatorio-mejorado* *jugador-bueno*)
+
+(print 'optimista_contra_aleatorio_mejorado)
+;(prueba 100 *jugador-optimista* *jugador-aleatorio*)

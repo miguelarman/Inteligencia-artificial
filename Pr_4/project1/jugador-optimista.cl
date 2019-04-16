@@ -8,11 +8,17 @@
 
 (defvar *alias* '|Balodding optimista v2|) ; alias que aparece en el ranking
 
-(defun heuristica (estado) (let
+(defun heuristica (estado)
+  (let
       ((jugador (estado-turno estado)))
-    (-
-     (finales-posibles estado jugador)
-     (finales-posibles estado (siguiente-jugador jugador)))))
+    (cond
+     ((ganador estado) +val-max+)
+     ((tablas-p estado) 0)                 ; Ajustar este valor
+     (T
+      (-
+       (finales-posibles estado jugador)
+       (finales-posibles estado (siguiente-jugador jugador)))))))
+
 
 (defun finales-posibles-vertical-casilla (estado jugador columna fila)
   (let*
