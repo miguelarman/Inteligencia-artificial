@@ -247,28 +247,30 @@
                       puntuacion)))))
   (print val1)
   (print (- n val2))
-  (print (/ (+ val1 (- n val2)) (* 2 n))))
+  (print (float (/ (+ val1 (- n val2)) (* 2 n)))))
 
 ; (setf l '(a b)) -> (A B)
 ; (car l) -> A
 ; (cadr l) -> B
+; (setf lista '(0 0))
+; (setf lista (cons (+ 0 (car lista)) (cons (+ 0 (cadr lista)) nil)))
 
 
 
 (print 'optimista_contra_aleatorio)
-;(prueba 100 *jugador-optimista* *jugador-aleatorio*)
+(prueba 100 *jugador-optimista* *jugador-aleatorio*)
 
 (print 'optimista_contra_bueno)
-;(prueba 10 *jugador-optimista* *jugador-bueno*)
+(prueba 10 *jugador-optimista* *jugador-bueno*)
 
 (print 'optimista_contra_optimista)
-;(prueba 10 *jugador-optimista* *jugador-optimista*)
+(prueba 10 *jugador-optimista* *jugador-optimista*)
 
 (print 'aleatorio_mejorado_contra_aleatorio)
-;(prueba 100 *jugador-aleatorio-mejorado* *jugador-aleatorio*)
+(prueba 100 *jugador-aleatorio-mejorado* *jugador-aleatorio*)
 
 (print 'aleatorio_mejorado_contra_bueno)
-;(prueba 100 *jugador-aleatorio-mejorado* *jugador-bueno*)
+(prueba 100 *jugador-aleatorio-mejorado* *jugador-bueno*)
 
 (print 'optimista_contra_aleatorio_mejorado)
-;(prueba 100 *jugador-optimista* *jugador-aleatorio*)
+(prueba 100 *jugador-optimista* *jugador-aleatorio*)
