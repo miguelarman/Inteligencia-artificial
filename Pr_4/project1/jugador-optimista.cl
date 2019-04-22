@@ -1,10 +1,10 @@
-(defpackage :3012_P01_7edf0 ; se declara un paquete con el grupo, la pareja y
+(defpackage :2301_P04_7edf0 ; se declara un paquete con el grupo, la pareja y
   
   ; el código
   (:use :common-lisp :conecta4) ; el paquete usa common-lisp y conecta4
   (:export :heuristica :*alias*)) ; exporta la función de evaluación y un alias
 
-(in-package 3012_P01_7edf0)
+(in-package 2301_P04_7edf0)
 
 (defvar *alias* '|Balodding optimista v2|) ; alias que aparece en el ranking
 
