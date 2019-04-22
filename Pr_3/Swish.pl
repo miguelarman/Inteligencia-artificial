@@ -76,7 +76,8 @@ cod_all([], []).
 % [[1], [2, 2], [3], [4, 4]]
 cod_all([X | Rest], [Lfront | Lsiguiente]) :-
     cod_primero(X, Rest, Lrest, Lfront),
-    cod_all(Lrest, Lsiguiente).
+    cod_all(Lrest, Lsiguiente),
+    !.
 
 
 % Apartado 3
@@ -95,7 +96,7 @@ run_length(L, Ret) :-
 % [[na a], ..., [nz, z]]
 % donde cada par representa el n�mero de veces que aparece el elemento
 % y el elemento
-cuenta_ternas([T], [L]) :- cuenta_terna(T, L).
+cuenta_ternas([T], [L]) :- cuenta_terna(T, L), !.
 cuenta_ternas([Terna|RTernas], [Par|RPares]) :-
     cuenta_terna(Terna, Par),
     cuenta_ternas(RTernas, RPares).
@@ -105,7 +106,7 @@ cuenta_ternas([Terna|RTernas], [Par|RPares]) :-
 % devuelve el par correspondiente:
 % [n, a]
 % donde a es el elemento y n el n�mero de veces que aparece
-cuenta_terna([X], [1, X]).
+cuenta_terna([X], [1, X]) :- !.
 cuenta_terna([X | L], [Nnew, X]) :-
     cuenta_terna(L, [N,_]),
     Nnew is N+1.
