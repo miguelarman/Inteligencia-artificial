@@ -17,12 +17,12 @@ invierte([F|R],L) :- concatena(I, [F], L), invierte(R, I).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Ejercicio 3
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-palindromo(X) :- invierte(Y, X), igual(X,Y).
+palindromo(X) :- invierte(Y, X), igual(X,Y), !.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Ejercicio 4
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-divide(L,0,[],L).
+divide(L,0,[],L) :- !.
 divide([A|L],N,[A|L1],L2) :- N>0,succ(New, N),divide(L,New,L1,L2).
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
