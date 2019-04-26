@@ -11,5 +11,5 @@
 (defun heuristica (estado)
   (cond
    ((ganador estado) +val-max+)
-   ((tablas-p estado) (/ +val-max+ 2))  ; Ajustado este valor dando mas peso
+   ((tablas-p estado) 0)
    (T (random 100))))
