@@ -6,14 +6,14 @@
 
 (in-package 2301_P04_7edf0)
 
-(defvar *alias* '|Balodding optimista v2|) ; alias que aparece en el ranking
+(defvar *alias* '|Padilla|) ; alias que aparece en el ranking
 
 (defun heuristica (estado)
   (let
       ((jugador (estado-turno estado)))
     (cond
      ((ganador estado) +val-max+)
-     ((tablas-p estado) 0)                 ; Ajustar este valor
+     ((tablas-p estado) 0) ; Ajustado este valor dandole mas peso
      (T
       (-
        (finales-posibles estado jugador)

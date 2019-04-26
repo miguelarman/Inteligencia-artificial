@@ -6,7 +6,8 @@
   :modules (list (make-instance 'module :name "P4_IA_2018_2019_conecta4")
                  (make-instance 'module :name "P4_IA_2018_2019_jugadores")
                  (make-instance 'module :name "jugador-optimista")
-                 (make-instance 'module :name "aleatorio-mejorado"))
+                 (make-instance 'module :name "aleatorio-mejorado")
+                 (make-instance 'module :name "bueno"))
   :projects nil
   :libraries nil
   :editable-files nil

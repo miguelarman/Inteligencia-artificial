@@ -6,10 +6,10 @@
 
 (in-package 2301_P04_cac9e)
 
-(defvar *alias* '|Balodding aleatorio v2|) ; alias que aparece en el ranking
+(defvar *alias* '|Bravo|) ; alias que aparece en el ranking
 
 (defun heuristica (estado)
   (cond
    ((ganador estado) +val-max+)
-   ((tablas-p estado) 0)                 ; Ajustar este valor
+   ((tablas-p estado) (/ +val-max+ 2))  ; Ajustado este valor dando mas peso
    (T (random 100))))
