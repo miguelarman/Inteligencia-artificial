@@ -216,6 +216,7 @@
               ((eql ficha jugador) (+ 2 conteo))
               ((and (null ficha) (or (= fila 1) (not (null ficha-debajo)))) (+ 1 conteo))
               ((null ficha) conteo)
+              ((= n 4) 0)
               (T nil))))))
 
 (defun contar-abajo-aux-mas (tablero jugador columna fila n)
@@ -232,6 +233,7 @@
               ((null conteo) nil) ;1 si tenemos una ficha nuestra puesta
               ((null ficha) conteo) ;0 si no hay una ficha puesta aun
               ((eql ficha jugador) (+ 1 conteo))
+              ((= n 4) 0)
               (T nil))))))
 
 (defun contar-abajo-derecha-aux-mas (tablero jugador columna fila n)
@@ -251,6 +253,7 @@
               ((eql ficha jugador) (+ 2 conteo))
               ((and (null ficha) (or (= fila 1) (not (null ficha-debajo)))) (+ 1 conteo))
               ((null ficha) conteo)
+              ((= n 4) 0)
               (T nil))))))
 
 (defun contar-abajo-izquierda-aux-mas (tablero jugador columna fila n)
@@ -270,6 +273,7 @@
               ((eql ficha jugador) (+ 2 conteo))
               ((and (null ficha) (or (= fila 1) (not (null ficha-debajo)))) (+ 1 conteo))
               ((null ficha) conteo)
+              ((= n 4) 0)
               (T nil))))))
 
 
@@ -282,11 +286,6 @@
        (vertical (contar-abajo-aux-mas tablero jugador columna fila 4))
        (diag1 (contar-abajo-derecha-aux-mas tablero jugador columna fila 4))
        (diag2 (contar-abajo-izquierda-aux-mas tablero jugador columna fila 4)))
-    (muestra-tablero tablero)
-    (print diag2)
-    (print diag1)
-    (print vertical)
-    (print horizontal)
     (if (and enemigo (or ;Damos maxima prioridad a que el enemigo no gane en la siguiente tirada
          (= vertical 3)
          (= horizontal 7)
@@ -301,7 +300,7 @@
       ((tablero (estado-tablero estado)))
     (if (not (dentro-del-tablero-p tablero columna fila))
         0
-      (if (not (dentro-del-tablero-p tablero (+ 1 columna) fila))
+      (if (not (dentro-del-tablero-p tablero (+ 1 columna) fila)) 
           (+
            (finales-posibles-recursiva-mas estado jugador 0 (+ 1 fila) enemigo)
            (finales-posibles-casilla-mas estado jugador columna fila enemigo))
@@ -394,14 +393,14 @@
 ;(prueba 20 *jugador-optimista* *jugador-aleatorio-mejorado*)
 
 
-(print 'mas_optimista_contra_aleatorio)
-(time (prueba 25 *jugador-mas-optimista* *jugador-aleatorio*))
+;(print 'mas_optimista_contra_aleatorio)
+;(time (prueba 25 *jugador-mas-optimista* *jugador-aleatorio*))
 
-(print 'mas_optimista_contra_bueno)
-(prueba 10 *jugador-mas-optimista* *jugador-bueno*)
+;(print 'mas_optimista_contra_bueno)
+;(prueba 10 *jugador-mas-optimista* *jugador-bueno*)
 
-(print 'mas_optimista_contra_mas_optimista)
-(prueba 10 *jugador-mas-optimista* *jugador-mas-optimista*)
+;(print 'mas_optimista_contra_mas_optimista)
+;(prueba 10 *jugador-mas-optimista* *jugador-mas-optimista*)
 
-(print 'mas_optimista_contra_optimista)
-(prueba 10 *jugador-mas-optimista* *jugador-optimista*)
+;(print 'mas_optimista_contra_optimista)
+;(prueba 10 *jugador-mas-optimista* *jugador-optimista*)
