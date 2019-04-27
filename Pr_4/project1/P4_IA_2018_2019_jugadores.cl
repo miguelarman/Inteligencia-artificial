@@ -260,5 +260,5 @@
 ;(print 'aleatorio_mejorado_contra_bueno)
 ;(prueba 100 *jugador-aleatorio-mejorado* *jugador-bueno*)
 
-(print 'optimista_contra_aleatorio_mejorado)
-(prueba 20 *jugador-optimista* *jugador-aleatorio-mejorado*)
+;(print 'optimista_contra_aleatorio_mejorado)
+;(prueba 20 *jugador-optimista* *jugador-aleatorio-mejorado*)
