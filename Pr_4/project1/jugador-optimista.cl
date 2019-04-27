@@ -17,7 +17,7 @@
      (T
       (-
        (finales-posibles estado jugador)
-       (finales-posibles estado (siguiente-jugador jugador)))))))))
+       (finales-posibles estado (siguiente-jugador jugador)))))))
 
 (defun contar-derecha-aux (tablero jugador columna fila n)
   (if (not (dentro-del-tablero-p tablero columna fila))
