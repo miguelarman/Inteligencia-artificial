@@ -184,7 +184,137 @@
 
 (defvar *jugador-optimista* (make-jugador :nombre 'Optimista
                                      :f-jugador #'f-jugador-negamax
-                                     :f-eval  #'diferencia-finales))
+                                          :f-eval  #'diferencia-finales))
+
+; --------------------------------------------------------
+(defun f-eval-mas (estado)
+  (let
+      ((jugador (estado-turno estado)))
+    (cond
+     ((ganador estado) +val-max+)
+     ((tablas-p estado) 0) ; Ajustado este valor dandole mas peso
+     (T
+      (-
+       (finales-posibles-mas estado jugador nil)
+       (finales-posibles-mas estado (siguiente-jugador jugador) T))))))
+
+
+(defun contar-derecha-aux-mas (tablero jugador columna fila n)
+  (if (not (dentro-del-tablero-p tablero columna fila))
+      nil
+    (let*
+        ((ficha (obtener-ficha tablero columna fila))
+         (ficha-debajo (obtener-ficha tablero columna (- fila 1)))
+         (conteo (contar-derecha-aux-mas tablero jugador (+ 1 columna) fila (- n 1)))) 
+      (if (= 1 n)
+          (cond ((eql ficha jugador) 2)
+                ((and (null ficha) (or (= fila 1) (not (null ficha-debajo)))) 1)
+                ((null ficha) 0)
+                (T nil))
+        (cond ((and (= n 4) (null conteo)) 0)
+              ((null conteo) nil)
+              ((eql ficha jugador) (+ 2 conteo))
+              ((and (null ficha) (or (= fila 1) (not (null ficha-debajo)))) (+ 1 conteo))
+              ((null ficha) conteo)
+              (T nil))))))
+
+(defun contar-abajo-aux-mas (tablero jugador columna fila n)
+  (if (not (dentro-del-tablero-p tablero columna fila))
+      nil
+    (let*
+        ((ficha (obtener-ficha tablero columna fila))
+         (conteo (contar-abajo-aux-mas tablero jugador columna (+ 1 fila) (- n 1))))
+      (if (= 1 n) ;Caso base
+          (cond ((eql ficha jugador) 1)
+                ((null ficha) 0)
+                (T nil))
+        (cond ((and (= n 4) (null conteo)) 0) ;Nil si no hay espacio para hacer 4 o si el enemigo lo ha interceptado
+              ((null conteo) nil) ;1 si tenemos una ficha nuestra puesta
+              ((null ficha) conteo) ;0 si no hay una ficha puesta aun
+              ((eql ficha jugador) (+ 1 conteo))
+              (T nil))))))
+
+(defun contar-abajo-derecha-aux-mas (tablero jugador columna fila n)
+  (if (not (dentro-del-tablero-p tablero columna fila))
+      nil
+    (let*
+        ((ficha (obtener-ficha tablero columna fila))
+         (ficha-debajo (obtener-ficha tablero columna (- fila 1)))
+         (conteo (contar-derecha-aux-mas tablero jugador (+ 1 columna) (+ 1 fila) (- n 1)))) 
+      (if (= 1 n)
+          (cond ((eql ficha jugador) 2)
+                ((and (null ficha) (or (= fila 1) (not (null ficha-debajo)))) 1)
+                ((null ficha) 0)
+                (T nil))
+        (cond ((and (= n 4) (null conteo)) 0)
+              ((null conteo) nil)
+              ((eql ficha jugador) (+ 2 conteo))
+              ((and (null ficha) (or (= fila 1) (not (null ficha-debajo)))) (+ 1 conteo))
+              ((null ficha) conteo)
+              (T nil))))))
+
+(defun contar-abajo-izquierda-aux-mas (tablero jugador columna fila n)
+  (if (not (dentro-del-tablero-p tablero columna fila))
+      nil
+    (let*
+        ((ficha (obtener-ficha tablero columna fila))
+         (ficha-debajo (obtener-ficha tablero columna (- fila 1)))
+         (conteo (contar-derecha-aux-mas tablero jugador (+ 1 columna) (+ 1 fila) (- n 1)))) 
+      (if (= 1 n)
+          (cond ((eql ficha jugador) 2)
+                ((and (null ficha) (or (= fila 1) (not (null ficha-debajo)))) 1)
+                ((null ficha) 0)
+                (T nil))
+        (cond ((and (= n 4) (null conteo)) 0)
+              ((null conteo) nil)
+              ((eql ficha jugador) (+ 2 conteo))
+              ((and (null ficha) (or (= fila 1) (not (null ficha-debajo)))) (+ 1 conteo))
+              ((null ficha) conteo)
+              (T nil))))))
+
+
+
+
+(defun finales-posibles-casilla-mas (estado jugador columna fila enemigo)
+  (let*
+      ((tablero (estado-tablero estado))
+       (horizontal (contar-derecha-aux-mas tablero jugador columna fila 4))
+       (vertical (contar-abajo-aux-mas tablero jugador columna fila 4))
+       (diag1 (contar-abajo-derecha-aux-mas tablero jugador columna fila 4))
+       (diag2 (contar-abajo-izquierda-aux-mas tablero jugador columna fila 4)))
+    (muestra-tablero tablero)
+    (print diag2)
+    (print diag1)
+    (print vertical)
+    (print horizontal)
+    (if (and enemigo (or ;Damos maxima prioridad a que el enemigo no gane en la siguiente tirada
+         (= vertical 3)
+         (= horizontal 7)
+         (= diag1 7)
+         (= diag2 7)))
+        (- +val-max+ 1)
+      (+ horizontal vertical diag1 diag2))))
+
+
+(defun finales-posibles-recursiva-mas (estado jugador columna fila enemigo)
+  (let*
+      ((tablero (estado-tablero estado)))
+    (if (not (dentro-del-tablero-p tablero columna fila))
+        0
+      (if (not (dentro-del-tablero-p tablero (+ 1 columna) fila))
+          (+
+           (finales-posibles-recursiva-mas estado jugador 0 (+ 1 fila) enemigo)
+           (finales-posibles-casilla-mas estado jugador columna fila enemigo))
+        (+
+         (finales-posibles-recursiva-mas estado jugador (+ 1 columna) fila enemigo)
+         (finales-posibles-casilla-mas estado jugador columna fila enemigo))))))
+        
+(defun finales-posibles-mas (estado jugador enemigo)
+  (finales-posibles-recursiva-mas estado jugador 0 0 enemigo))
+
+(defvar *jugador-mas-optimista* (make-jugador :nombre 'Mas-optimista
+                                          :f-jugador #'f-jugador-negamax
+                                          :f-eval  #'f-eval-mas))
 ; --------------------------------------------------------
 ; Aleatoria pero escoge los finales inmediatos
 (defun f-aleatoria-mejorada (estado)
@@ -262,3 +392,16 @@
 
 ;(print 'optimista_contra_aleatorio_mejorado)
 ;(prueba 20 *jugador-optimista* *jugador-aleatorio-mejorado*)
+
+
+(print 'mas_optimista_contra_aleatorio)
+(time (prueba 25 *jugador-mas-optimista* *jugador-aleatorio*))
+
+(print 'mas_optimista_contra_bueno)
+(prueba 10 *jugador-mas-optimista* *jugador-bueno*)
+
+(print 'mas_optimista_contra_mas_optimista)
+(prueba 10 *jugador-mas-optimista* *jugador-mas-optimista*)
+
+(print 'mas_optimista_contra_optimista)
+(prueba 10 *jugador-mas-optimista* *jugador-optimista*)
