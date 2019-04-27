@@ -204,7 +204,7 @@
       nil
     (let*
         ((ficha (obtener-ficha tablero columna fila))
-         (ficha-debajo (if (= fila 0) 1 (obtener-ficha tablero columna (- fila 1))))
+         (ficha-debajo (obtener-ficha tablero columna (- fila 1)))
          (conteo (contar-derecha-aux-mas tablero jugador (+ 1 columna) fila (- n 1)))) 
       (if (= 1 n)
           (cond ((eql ficha jugador) 2)
@@ -241,7 +241,7 @@
       nil
     (let*
         ((ficha (obtener-ficha tablero columna fila))
-         (ficha-debajo (if (= fila 0) 1 (obtener-ficha tablero columna (- fila 1))))
+         (ficha-debajo (obtener-ficha tablero columna (- fila 1)))
          (conteo (contar-derecha-aux-mas tablero jugador (+ 1 columna) (+ 1 fila) (- n 1)))) 
       (if (= 1 n)
           (cond ((eql ficha jugador) 2)
@@ -261,8 +261,9 @@
       nil
     (let*
         ((ficha (obtener-ficha tablero columna fila))
-         (ficha-debajo (if (= fila 0) 1 (obtener-ficha tablero columna (- fila 1))))
+         (ficha-debajo (obtener-ficha tablero columna (- fila 1)))
          (conteo (contar-derecha-aux-mas tablero jugador (+ 1 columna) (+ 1 fila) (- n 1)))) 
+      (print ficha-debajo)
       (if (= 1 n)
           (cond ((eql ficha jugador) 2)
                 ((and (null ficha) (or (= fila 0) (not (null ficha-debajo)))) 1)
