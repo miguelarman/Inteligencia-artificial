@@ -393,14 +393,14 @@
 ;(prueba 20 *jugador-optimista* *jugador-aleatorio-mejorado*)
 
 
-(print 'mas_optimista_contra_aleatorio)
-(time (prueba 25 *jugador-mas-optimista* *jugador-aleatorio*))
+;(print 'mas_optimista_contra_aleatorio)
+;(time (prueba 25 *jugador-mas-optimista* *jugador-aleatorio*))
 
-(print 'mas_optimista_contra_bueno)
-(prueba 1 *jugador-mas-optimista* *jugador-bueno*)
+;(print 'mas_optimista_contra_bueno)
+;(prueba 1 *jugador-mas-optimista* *jugador-bueno*)
 
-(print 'mas_optimista_contra_mas_optimista)
-(prueba 1 *jugador-mas-optimista* *jugador-mas-optimista*)
+;(print 'mas_optimista_contra_mas_optimista)
+;(prueba 1 *jugador-mas-optimista* *jugador-mas-optimista*)
 
-(print 'mas_optimista_contra_optimista)
-(prueba 1 *jugador-mas-optimista* *jugador-optimista*)
+;(print 'mas_optimista_contra_optimista)
+;(prueba 1 *jugador-mas-optimista* *jugador-optimista*)
