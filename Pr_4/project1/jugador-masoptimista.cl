@@ -25,18 +25,19 @@
       nil
     (let*
         ((ficha (obtener-ficha tablero columna fila))
-         (ficha-debajo (obtener-ficha tablero columna (- fila 1)))
+         (ficha-debajo (if (= fila 0) 1 (obtener-ficha tablero columna (- fila 1))))
          (conteo (contar-derecha-aux-mas tablero jugador (+ 1 columna) fila (- n 1)))) 
       (if (= 1 n)
           (cond ((eql ficha jugador) 2)
-                ((and (null ficha) (or (= fila 1) (not (null ficha-debajo)))) 1)
+                ((and (null ficha) (or (= fila 0) (not (null ficha-debajo)))) 1)
                 ((null ficha) 0)
                 (T nil))
         (cond ((and (= n 4) (null conteo)) 0)
               ((null conteo) nil)
               ((eql ficha jugador) (+ 2 conteo))
-              ((and (null ficha) (or (= fila 1) (not (null ficha-debajo)))) (+ 1 conteo))
+              ((and (null ficha) (or (= fila 0) (not (null ficha-debajo)))) (+ 1 conteo))
               ((null ficha) conteo)
+              ((= n 4) 0)
               (T nil))))))
 
 (defun contar-abajo-aux-mas (tablero jugador columna fila n)
@@ -53,6 +54,7 @@
               ((null conteo) nil) ;1 si tenemos una ficha nuestra puesta
               ((null ficha) conteo) ;0 si no hay una ficha puesta aun
               ((eql ficha jugador) (+ 1 conteo))
+              ((= n 4) 0)
               (T nil))))))
 
 (defun contar-abajo-derecha-aux-mas (tablero jugador columna fila n)
@@ -60,18 +62,19 @@
       nil
     (let*
         ((ficha (obtener-ficha tablero columna fila))
-         (ficha-debajo (obtener-ficha tablero columna (- fila 1)))
+         (ficha-debajo (if (= fila 0) 1 (obtener-ficha tablero columna (- fila 1))))
          (conteo (contar-derecha-aux-mas tablero jugador (+ 1 columna) (+ 1 fila) (- n 1)))) 
       (if (= 1 n)
           (cond ((eql ficha jugador) 2)
-                ((and (null ficha) (or (= fila 1) (not (null ficha-debajo)))) 1)
+                ((and (null ficha) (or (= fila 0) (not (null ficha-debajo)))) 1)
                 ((null ficha) 0)
                 (T nil))
         (cond ((and (= n 4) (null conteo)) 0)
               ((null conteo) nil)
               ((eql ficha jugador) (+ 2 conteo))
-              ((and (null ficha) (or (= fila 1) (not (null ficha-debajo)))) (+ 1 conteo))
+              ((and (null ficha) (or (= fila 0) (not (null ficha-debajo)))) (+ 1 conteo))
               ((null ficha) conteo)
+              ((= n 4) 0)
               (T nil))))))
 
 (defun contar-abajo-izquierda-aux-mas (tablero jugador columna fila n)
@@ -79,18 +82,19 @@
       nil
     (let*
         ((ficha (obtener-ficha tablero columna fila))
-         (ficha-debajo (obtener-ficha tablero columna (- fila 1)))
+         (ficha-debajo (if (= fila 0) 1 (obtener-ficha tablero columna (- fila 1))))
          (conteo (contar-derecha-aux-mas tablero jugador (+ 1 columna) (+ 1 fila) (- n 1)))) 
       (if (= 1 n)
           (cond ((eql ficha jugador) 2)
-                ((and (null ficha) (or (= fila 1) (not (null ficha-debajo)))) 1)
+                ((and (null ficha) (or (= fila 0) (not (null ficha-debajo)))) 1)
                 ((null ficha) 0)
                 (T nil))
         (cond ((and (= n 4) (null conteo)) 0)
               ((null conteo) nil)
               ((eql ficha jugador) (+ 2 conteo))
-              ((and (null ficha) (or (= fila 1) (not (null ficha-debajo)))) (+ 1 conteo))
+              ((and (null ficha) (or (= fila 0) (not (null ficha-debajo)))) (+ 1 conteo))
               ((null ficha) conteo)
+              ((= n 4) 0)
               (T nil))))))
 
 
@@ -109,7 +113,7 @@
          (= diag1 7)
          (= diag2 7)))
         (- +val-max+ 1)
-      (+ horizontal vertical diag1 diag2) )))
+      (+ horizontal vertical diag1 diag2))))
 
 
 (defun finales-posibles-recursiva-mas (estado jugador columna fila enemigo)
@@ -117,7 +121,7 @@
       ((tablero (estado-tablero estado)))
     (if (not (dentro-del-tablero-p tablero columna fila))
         0
-      (if (not (dentro-del-tablero-p tablero (+ 1 columna) fila))
+      (if (not (dentro-del-tablero-p tablero (+ 1 columna) fila)) 
           (+
            (finales-posibles-recursiva-mas estado jugador 0 (+ 1 fila) enemigo)
            (finales-posibles-casilla-mas estado jugador columna fila enemigo))
