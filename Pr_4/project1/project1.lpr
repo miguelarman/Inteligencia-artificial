@@ -7,7 +7,8 @@
                  (make-instance 'module :name "P4_IA_2018_2019_jugadores")
                  (make-instance 'module :name "jugador-optimista")
                  (make-instance 'module :name "aleatorio-mejorado")
-                 (make-instance 'module :name "bueno"))
+                 (make-instance 'module :name "bueno")
+                 (make-instance 'module :name "jugador-masoptimista"))
   :projects nil
   :libraries nil
   :editable-files nil
