@@ -9,7 +9,9 @@
 (defvar *alias* '|Bravo|) ; alias que aparece en el ranking
 
 (defun heuristica (estado)
-  (cond
-   ((ganador estado) +val-max+)
-   ((tablas-p estado) 0)
-   (T (random 100))))
+  (if (juego-terminado-p estado)
+        (let ((ganador (ganador estado)))
+          (cond ((not ganador) 0)
+                ((eql ganador ficha-actual) +val-max+)
+                (t +val-min+)))
+    (random 100)))
