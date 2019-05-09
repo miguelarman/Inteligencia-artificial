@@ -333,15 +333,15 @@
       (unless devolver-estado (funcall f-eval estado))
     (let ((estados-sucesores (generar-sucesores estado)))
       (if (null estados-sucesores)
-	  (unless devolver-estado (funcall f-eval estado))
-	(let ((mejor-valor +val-min+)
-	      (mejor-sucesor))
-	  (loop for estado-sucesor in estados-sucesores do
-		(let ((valor (- (negamax-1 estado-sucesor nil (1+ profundidad) profundidad-max f-eval))))
-		  (when (>= valor mejor-valor)
-		    (setf mejor-valor valor)
-		    (setf mejor-sucesor estado-sucesor))))
-	  (if devolver-estado mejor-sucesor mejor-valor))))))
+          (unless devolver-estado (funcall f-eval estado))
+        (let ((mejor-valor +val-min+)
+              (mejor-sucesor))
+          (loop for estado-sucesor in estados-sucesores do
+                (let ((valor (- (negamax-1 estado-sucesor nil (1+ profundidad) profundidad-max f-eval))))
+                  (when (>= valor mejor-valor)
+                    (setf mejor-valor valor)
+                    (setf mejor-sucesor estado-sucesor))))
+          (if devolver-estado mejor-sucesor mejor-valor))))))
 
 ;; ------------------------------------------------------------------------
 

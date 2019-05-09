@@ -10,8 +10,10 @@
 
 (defun heuristica (estado)
   (if (juego-terminado-p estado)
-        (let ((ganador (ganador estado)))
-          (cond ((not ganador) 0)
-                ((eql ganador ficha-actual) +val-max+)
-                (t +val-min+)))
+      (let
+          ((ganador (ganador estado))
+           (ficha-actual (estado-turno estado)))
+        (cond ((not ganador) 0)
+              ((eql ganador ficha-actual) +val-max+)
+              (t +val-min+)))
     (random 100)))

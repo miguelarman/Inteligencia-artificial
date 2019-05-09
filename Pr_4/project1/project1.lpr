@@ -8,7 +8,8 @@
                  (make-instance 'module :name "jugador-optimista")
                  (make-instance 'module :name "aleatorio-mejorado")
                  (make-instance 'module :name "bueno")
-                 (make-instance 'module :name "jugador-masoptimista"))
+                 (make-instance 'module :name "jugador-masoptimista")
+                 (make-instance 'module :name "jugador-gauss"))
   :projects nil
   :libraries nil
   :editable-files nil

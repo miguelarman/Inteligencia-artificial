@@ -189,14 +189,16 @@
 ; --------------------------------------------------------
 (defun f-eval-mas (estado)
   (let
-      ((jugador (estado-turno estado)))
-    (cond
-     ((ganador estado) +val-max+)
-     ((tablas-p estado) 0) ; Ajustado este valor dandole mas peso
-     (T
+      ((jugador (estado-turno estado))
+       (ficha-actual (estado-turno estado)))
+    (if (juego-terminado-p estado)
+        (let ((ganador (ganador estado)))
+          (cond ((not ganador) 0)
+                ((eql ganador ficha-actual) +val-max+)
+                (t +val-min+)))
       (-
        (finales-posibles-mas estado jugador nil)
-       (finales-posibles-mas estado (siguiente-jugador jugador) T))))))
+       (finales-posibles-mas estado (siguiente-jugador jugador) T)))))
 
 
 (defun contar-derecha-aux-mas (tablero jugador columna fila n)
@@ -317,14 +319,66 @@
 ; --------------------------------------------------------
 ; Aleatoria pero escoge los finales inmediatos
 (defun f-aleatoria-mejorada (estado)
-  (cond
-   ((ganador estado) +val-max+)
-   ((tablas-p estado) 0)                 ; Ajustar este valor
-   (T (random 100))))
+  (if (juego-terminado-p estado)
+      (let
+          ((ganador (ganador estado))
+           (ficha-actual (estado-turno estado)))
+        (cond ((not ganador) 0)
+              ((eql ganador ficha-actual) +val-max+)
+              (t +val-min+)))
+    (random 100)))
 
 (defvar *jugador-aleatorio-mejorado* (make-jugador :nombre 'Aleatorio-mejorado
                                      :f-jugador #'f-jugador-negamax
                                      :f-eval  #'f-aleatoria-mejorada))
+; --------------------------------------------------------
+(defvar *gauss*
+    (list
+     (list 3 4 5 7 5 4 3)
+     (list 4 6 8 10 8 6 4)
+     (list 5 8 11 13 11 8 5)
+     (list 5 8 11 13 11 8 5)
+     (list 4 6 8 10 8 6 4)
+     (list 3 4 5 7 5 4 3)))
+
+(defun array-get (array i j)
+  (nth j (nth i array)))
+
+(defun cuenta-tablero (estado fila columna array)
+    (let*
+      ((tablero (estado-tablero estado)))
+    (if (not (dentro-del-tablero-p tablero columna fila))
+        0
+      (let*
+          ((valor (array-get array fila columna))
+           (casilla (obtener-ficha tablero columna fila))
+           (jugador (estado-turno estado))
+           (contribucion (cond
+                          ((null casilla) 0)
+                          ((= casilla jugador) valor)
+                          (T (- 0 valor)))))
+      (if (not (dentro-del-tablero-p tablero (+ 1 columna) fila)) 
+          (+
+           (cuenta-tablero estado (+ 1 fila) columna array)
+           contribucion)
+        (+
+         (cuenta-tablero estado (+ 1 columna) fila array)
+         contribucion))))))
+
+
+(defun f-gauss (estado)
+  (if (juego-terminado-p estado)
+      (let*
+          ((ganador (ganador estado))
+           (ficha (estado-turno estado)))
+        (cond ((not ganador) 0)
+              ((eql ganador ficha) +val-max+)
+              (t +val-min+)))
+    (cuenta-tablero estado 0 0 *gauss*)))
+
+(defvar *jugador-gauss* (make-jugador :nombre 'Jugador-gauss
+                                      :f-jugador #'f-jugador-negamax
+                                      :f-eval  #'f-gauss))
 ; --------------------------------------------------------
 
 
@@ -345,6 +399,8 @@
 ;(print (partida *jugador-aleatorio* *jugador-humano*))
 
 ;(print (partida *jugador-aleatorio* *jugador-optimista* 4))
+
+;(print (partida *jugador-gauss* *jugador-gauss* 4))
 
 (defun prueba (n jugador enemigo)
   (setq val1 0)
@@ -385,22 +441,103 @@
 
 ;(print 'aleatorio_mejorado_contra_aleatorio)
 ;(prueba 100 *jugador-aleatorio-mejorado* *jugador-aleatorio*)
+;68
+;81
+;0.745
 
 ;(print 'aleatorio_mejorado_contra_bueno)
 ;(prueba 100 *jugador-aleatorio-mejorado* *jugador-bueno*)
+;11
+;14
+;0.125
+
+;(print 'aleatorio_contra_bueno)
+;(prueba 100 *jugador-aleatorio* *jugador-bueno*)
+;3
+;7
+;0.05
+
 
 ;(print 'optimista_contra_aleatorio_mejorado)
 ;(prueba 20 *jugador-optimista* *jugador-aleatorio-mejorado*)
-
+;9 
+;8 
+;0.425
 
 ;(print 'mas_optimista_contra_aleatorio)
-;(time (prueba 25 *jugador-mas-optimista* *jugador-aleatorio*))
+;(prueba 25 *jugador-mas-optimista* *jugador-aleatorio*)
+;24 
+;25 
 
 ;(print 'mas_optimista_contra_bueno)
-;(prueba 1 *jugador-mas-optimista* *jugador-bueno*)
+;(prueba 2 *jugador-mas-optimista* *jugador-bueno*)
+;2 
+;0 
+;0.5
 
 ;(print 'mas_optimista_contra_mas_optimista)
-;(prueba 1 *jugador-mas-optimista* *jugador-mas-optimista*)
+;(prueba 2 *jugador-mas-optimista* *jugador-mas-optimista*)
+;0 
+;2 
+;0.5
 
 ;(print 'mas_optimista_contra_optimista)
-;(prueba 1 *jugador-mas-optimista* *jugador-optimista*)
+;(prueba 2 *jugador-mas-optimista* *jugador-optimista*)
+;0 
+;2 
+;0.5
+
+; -----------------------------------
+
+;(print 'gauss_contra_aleatorio)
+;(prueba 50 *jugador-gauss* *jugador-aleatorio*)
+;40 
+;46 
+;0.86
+
+;(print 'gauss_contra_aleatorio_mejorado)
+;(prueba 50 *jugador-gauss* *jugador-aleatorio-mejorado*)
+;27
+;25
+;0.52
+
+;(print 'gauss_contra_bueno)
+;(prueba 1 *jugador-gauss* *jugador-bueno*)
+;1 
+;1 
+;1.0
+
+; -----------------------------------
+
+
+;(print 'gauss_contra_mas_optimista)
+;(prueba 1 *jugador-gauss* *jugador-mas-optimista*)
+;0 
+;0 
+;0.0
+
+
+; -----------------------------
+;(print 'bueno_contra_aleatorio_mejorado)
+;(prueba 50 *jugador-bueno* *jugador-aleatorio-mejorado*)
+;21 
+;30
+;0.51
+
+;(print 'optimista_contra_aleatorio_mejorado)
+;(prueba 50 *jugador-optimista* *jugador-aleatorio-mejorado*)
+;16 
+;30 
+;0.46 
+
+;(print 'mas-optimista_contra_aleatorio_mejorado)
+;(prueba 50 *jugador-mas-optimista* *jugador-aleatorio-mejorado*)
+;40 
+;37 
+;0.77 
+
+;(print 'gauss_contra_aleatorio_mejorado)
+;(prueba 50 *jugador-gauss* *jugador-aleatorio-mejorado*)
+;26 
+;29 
+;0.55 

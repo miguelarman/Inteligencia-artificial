@@ -9,24 +9,22 @@
 (defvar *alias* '|Maldonado|) ; alias que aparece en el ranking
 
 (defun heuristica (estado)
-  (if (juego-terminado-p estado)
-      (let*
-          ((ganador (ganador estado))
-           (ficha (estado-turno estado)))
-        (cond
-         ((not ganador) 0)
-         ((eql ganador ficha) +val-max+)
-         (t +val-min+)))
-    (-
-     (finales-posibles estado jugador)
-     (finales-posibles estado (siguiente-jugador jugador)))))
+  (let
+      ((jugador (estado-turno estado)))
+    (cond
+     ((ganador estado) +val-max+)
+     ((tablas-p estado) 0) ; Ajustado este valor dandole mas peso
+     (T
+      (-
+       (finales-posibles estado jugador)
+       (finales-posibles estado (siguiente-jugador jugador)))))))
 
 (defun contar-derecha-aux (tablero jugador columna fila n)
-  (if (not (dentro-del-tablero-p tablero columna fila)) ; Caso base de la recusión
+  (if (not (dentro-del-tablero-p tablero columna fila))
       0
     (let*
         ((ficha (obtener-ficha tablero columna fila))) 
-      (if (= 1 n) ; Variable de la recursión que indica cuantas casillas a comprobar
+      (if (= 1 n)
           (if (or (null ficha) (eql ficha jugador))
               1
             0)
@@ -61,7 +59,7 @@
           0)))))
 
 (defun contar-abajo-izquierda-aux (tablero jugador columna fila n)
-  (if (not (dentro-del-tablero-p tablero columna fila)) ; Caso base de 
+  (if (not (dentro-del-tablero-p tablero columna fila))
       0
     (let*
         ((ficha (obtener-ficha tablero columna fila))) 
